@@ -1,4 +1,5 @@
 require 'rspec'
+require 'spec_helper'
 require_relative '../lib/grep'
 
 exam =[3,2,1,0,-1]
