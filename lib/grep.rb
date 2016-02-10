@@ -4,9 +4,9 @@ class Grep
   #   second is array of every item in exam_list NOT found in order_list
   def self.fgrepf(exam_list, order_list)
     if ! exam_list.instance_of?(Array)
-      abort "expected array to be passed!"
+      raise ArgumentError.new("expected array to be passed as first argument!")
     end
-
+    order_list ||= []
     # store pattern items in a hash
     exam_list_h = {}
     exam_list.each { |f| exam_list_h[f] = f }
