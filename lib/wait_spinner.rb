@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 # http://stackoverflow.com/questions/10262235/printing-an-ascii-spinning-cursor-in-the-console
 
 class WaitSpinner
