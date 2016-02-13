@@ -35,8 +35,7 @@ class Date2
        self.corrected_prefix_for(date_or_date_time, @@pattern_date_time_x1, @@pattern_date_x1) \
     || self.corrected_prefix_for(date_or_date_time, @@pattern_date_time_x2, @@pattern_date_x2)
   end
-  private
-
+  # private
   def self.prefix_for(date_or_date_time, pattern_date_time, pattern_date)
     if match = date_or_date_time.match(pattern_date_time)
       prefix=match.captures[0..11].join
@@ -103,7 +102,7 @@ class Date2
     return "image.#{base}" if base =~ /^...$/i
     base
   end
-  private
+
   year='([\dX][\dX][\dX][\dX])'
   two='([\dX][\dX]?)'
   d='([-_:\.])' #'([-:\.])'
