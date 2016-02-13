@@ -53,9 +53,9 @@ class Date2
   def self.corrected_prefix_for(date_or_date_time, pattern_date_time, pattern_date)
     match = date_or_date_time.match(pattern_date_time)
     if match
-      year, x, month, x, day, x, hours, x, minutes, x, seconds, ampm = match.captures
-      # 0   1    2    3   4   5    6    7     8     9    10      11
-      # ^^^^^^^^^^^^^  the captures ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, ampm = match.captures
+      # 0    1    2     3   4    5    6     7     8      9    10      11
+      # ^^^^^^^^^^^^^^  the captures  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       if ampm && ampm =~ /PM/
         hours = (hours.to_i + 12).to_s
       end
@@ -72,9 +72,9 @@ class Date2
     match = date_or_date_time.match(pattern_date)
     #puts "match.nil?: #{match.nil?}"
     if match
-      year, x, month, x, day = match.captures
-      # 0   1    2    3   4
-      # ^^  the captures ^^
+      year,  _x, month, _x, day = match.captures
+      # 0     1    2     3   4
+      # ^^    the captures  ^^
       if day.length > 2 # 2008-01-31 <= 01-31-2008
         year, month, day = day, year, month
       end
