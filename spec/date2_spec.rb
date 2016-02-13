@@ -1,4 +1,6 @@
-require 'date2'
+require 'rspec'
+require 'spec_helper'
+require_relative '../lib/date2'
 
        #         input                  #prefix_for_file_x    #corrected_prefix_for_file_x
 simple =['2010-01-18 09-40-45.png',     '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
