@@ -121,8 +121,13 @@ class Date2
   @@pattern_date2        = /^(\d\d)#{d}(\d\d)#{d}(\d\d\d\d)([^\/]*)$/
   @@pattern_date_time1   = /^(\d\d\d\d)#{d}(\d\d)#{d}(\d\d)([ -_\.])(\d\d)#{d}(\d\d)#{d}(\d\d)#{ampm}([^\/]*)$/i
   @@pattern_date_time2   = /^(\d\d)#{d}(\d\d)#{d}(\d\d\d\d)([ -_\.])(\d\d)#{d}(\d\d)#{d}(\d\d)#{ampm}([^\/]*)$/i
-  @@pattern_date_x1      = /^#{year}#{d}#{two}#{d}#{two}([^\/]*)$/
-  @@pattern_date_x2      = /^#{two}#{d}#{two}#{d}#{year}([^\/]*)$/
-  @@pattern_date_time_x1 = /^#{year}#{d}#{two}#{d}#{two}([ -_\.])#{two}#{d}#{two}#{d}#{two}#{ampm}([^\/]*)$/i
-  @@pattern_date_time_x2 = /^#{two}#{d}#{two}#{d}#{year}([ -_\.])#{two}#{d}#{two}#{d}#{two}#{ampm}([^\/]*)$/i
+
+  @date            = "#{two}#{d}#{two}#{d}#{two}#{ampm}"
+  @year_month_date = "#{year}#{d}#{two}#{d}#{two}"
+  @date_month_year = "#{two}#{d}#{two}#{d}#{year}"
+
+  @@pattern_date_x1      = /^#{@year_month_date}([^\/]*)$/
+  @@pattern_date_x2      = /^#{@date_month_year}([^\/]*)$/
+  @@pattern_date_time_x1 = /^#{@year_month_date}([ -_\.])#{@date}([^\/]*)$/i
+  @@pattern_date_time_x2 = /^#{@date_month_year}([ -_\.])#{@date}([^\/]*)$/i
 end
