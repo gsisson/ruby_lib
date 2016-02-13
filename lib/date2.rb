@@ -36,16 +36,17 @@ class Date2
     || self.corrected_prefix_for_PRIVATE(date_or_date_time, @@pattern_date_time_x2, @@pattern_date_x2)
   end
   # private
+  def self.extract_prefix_PRIVATE(upper_limit, match, date_or_date_time)
+      prefix=match.captures[0..upper_limit].join
+      base = date_or_date_time.sub(prefix,'')
+      date_or_date_time.sub(/#{Regexp.quote(base)}/,'')
+  end
   def self.prefix_for_PRIVATE(date_or_date_time, pattern_date_time, pattern_date)
     if match = date_or_date_time.match(pattern_date_time)
-      prefix=match.captures[0..11].join
-      base = date_or_date_time.sub(prefix,'')
-      return date_or_date_time.sub(/#{Regexp.quote(base)}/,'')
+      return extract_prefix_PRIVATE(11, match, date_or_date_time)
     end
     if match = date_or_date_time.match(pattern_date)
-      prefix=match.captures[0..4].join
-      base = date_or_date_time.sub(prefix,'')
-      return date_or_date_time.sub(/#{Regexp.quote(base)}/,'')
+      return extract_prefix_PRIVATE(4, match, date_or_date_time)
     end
     nil
   end
