@@ -2,22 +2,29 @@ require 'rspec'
 require 'spec_helper'
 require_relative '../lib/date2'
 
-       #         input                  #prefix_for_file_x    #corrected_prefix_for_file_x
-simple =['2010-01-18 09-40-45.png',     '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
-ext    =['2010-01-18 09-40-45.JPG',     '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
-pm     =['2010-01-18 09-40-45 PM.jpg',  '2010-01-18 09-40-45 PM', '2010-01-18_21.40.45']
-am     =['2010-01-18 09-40-45 AM.png',  '2010-01-18 09-40-45 AM', '2010-01-18_09.40.45']
-amX    =['2010-01-18 09-40-45 XM.png',  '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
-exes   =['2010-XX-XX_09-40-45.avi',     '2010-XX-XX_09-40-45',    '2010-XX-XX_09.40.45']
-hard   =['2010-8-1_9-4-5.png',          '2010-8-1_9-4-5',         '2010-08-01_09.04.05']
+       #         input                    #prefix_for_file_x      #corrected_prefix_for_file_x
+simple =['2010-01-18 09-40-45.png',       '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
+simpleR=['01-18-2010 09-40-45.png',       '01-18-2010 09-40-45',    '2010-01-18_09.40.45']
+ext    =['2010-01-18 09-40-45.JPG',       '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
+pm     =['2010-01-18 09-40-45 PM.jpg',    '2010-01-18 09-40-45 PM', '2010-01-18_21.40.45']
+am     =['2010-01-18 09-40-45 AM.png',    '2010-01-18 09-40-45 AM', '2010-01-18_09.40.45']
+amX    =['2010-01-18 09-40-45 XM.png',    '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
+exes   =['2010-XX-XX_09-40-45.avi',       '2010-XX-XX_09-40-45',    '2010-XX-XX_09.40.45']
+hard   =['2010-8-1_9-4-5.png',            '2010-8-1_9-4-5',         '2010-08-01_09.04.05']
 
-simple2=['2010-01-18 09-40-45_img.png',     '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
-ext2   =['2010-01-18 09-40-45_img.JPG',     '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
-pm2    =['2010-01-18 09-40-45 PM_img.jpg',  '2010-01-18 09-40-45 PM', '2010-01-18_21.40.45']
-am2    =['2010-01-18 09-40-45 AM_img.png',  '2010-01-18 09-40-45 AM', '2010-01-18_09.40.45']
-amX2   =['2010-01-18 09-40-45 XM_img.png',  '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
-exes2  =['2010-XX-XX_09-40-45_img.avi',     '2010-XX-XX_09-40-45',    '2010-XX-XX_09.40.45']
-hard2  =['2010-8-1_9-4-5_img.png',          '2010-8-1_9-4-5',         '2010-08-01_09.04.05']
+simple1=['2010-01-18.png',                '2010-01-18',             '2010-01-18_00.00.00']
+simpled=['2010-01-18.png',                '2010-01-18',             '2010-01-18'         ]
+hard1  =['2010-8-1_img.png',              '2010-8-1',               '2010-08-01'         ]
+hard1R =['8-1-2010_img.png',              '8-1-2010',               '2010-08-01'         ]
+
+simple2=['2010-01-18 09-40-45_img.png',   '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
+ext2   =['2010-01-18 09-40-45_img.JPG',   '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
+pm2    =['2010-01-18 09-40-45 PM_img.jpg','2010-01-18 09-40-45 PM', '2010-01-18_21.40.45']
+am2    =['2010-01-18 09-40-45 AM_img.png','2010-01-18 09-40-45 AM', '2010-01-18_09.40.45']
+amX2   =['2010-01-18 09-40-45 XM_img.png','2010-01-18 09-40-45',    '2010-01-18_09.40.45']
+exes2  =['2010-XX-XX_09-40-45_img.avi',   '2010-XX-XX_09-40-45',    '2010-XX-XX_09.40.45']
+hard2  =['2010-8-1_9-4-5_img.png',        '2010-8-1_9-4-5',         '2010-08-01_09.04.05']
+
 
 describe '#valid_date?' do
   it 'should accept a valid date' do
@@ -26,12 +33,16 @@ describe '#valid_date?' do
   it 'should accept a valid date-time' do
     expect(Date2.valid_date? simple[0]).to be(true)
   end
+  it 'should accept a valid date' do
+    expect(Date2.valid_date? simple[0]).to be(true)
+    expect(Date2.valid_date? simpleR[0]).to be(true)
+  end
   it 'should reject a date-time with Xs' do
     expect(Date2.valid_date? exes[0]).to be(false)
   end
-  it 'should reject an invalid date' do
+  xit 'should reject an invalid date' do
     @vd1 = '2010-03-12_31.22.33'
-#   expect(Date2.valid_date? @vd1).to be(false)
+    expect(Date2.valid_date? @vd1).to be(false)
   end
 end
 
@@ -46,22 +57,48 @@ describe '#valid_date_x?' do
     expect(Date2.valid_date_x? exes[0]).to be(true)
   end
   it 'should reject an invalid date' do
-    @vd1 = '2010-03-12_31.22.33'
-#   expect(Date2.valid_date_x? @vd1).to be(false)
+    @vd1 = '201@-03-12_31.22.33'
+    expect(Date2.valid_date_x? @vd1).to be(false)
+  end
+end
+
+describe '#valid_date_time_x?' do
+  it 'should accept a valid date-time' do
+    expect(Date2.valid_date_time_x? simple[0]).to be(true)
+  end
+  it 'should accept a date-time with Xs' do
+    expect(Date2.valid_date_time_x? exes[0]).to be(true)
+  end
+  it 'should reject just a date' do
+    expect(Date2.valid_date_time_x? '2010-03-12').to be(false)
+  end
+  it 'should reject an invalid date' do
+    @vd1 = '201@-03-12_31.22.33'
+    expect(Date2.valid_date_time_x? @vd1).to be(false)
   end
 end
 
 describe '#valid_date_time?' do
   it 'should accept a valid date time' do
-    expect(Date2.valid_date? simple[0]).to be(true)
+    expect(Date2.valid_date_time? simple[0]).to be(true)
+    expect(Date2.valid_date_time? simpleR[0]).to be(true)
   end
   it 'should reject an invalid date time' do
-    @vd1 = '2010-03-12_31.22.33'
-#   expect(Date2.valid_date? @vd1).to be(false)
+    @vd1 = '201@-03-12_31.22.33'
+    expect(Date2.valid_date_time? @vd1).to be(false)
+  end
+end
+
+describe '#prefix_for_file' do
+  it 'should support the simple case (when there is no image name)' do
+    expect(Date2.prefix_for_file(simple[0])).to eq(simple[1])
   end
 end
 
 describe '#prefix_for_file_x' do
+  it 'should support the simple2 case (when there is no image name)' do
+    expect(Date2.prefix_for_file_x(simple1[0])).to eq(simple1[1])
+  end
   it 'should support the simple case (when there is no image name)' do
     expect(Date2.prefix_for_file_x(simple[0])).to eq(simple[1])
   end
@@ -103,6 +140,15 @@ describe '#prefix_for_file_x' do
   end
   it 'should support a hard date' do
     expect(Date2.prefix_for_file_x(hard2[0])).to eq(hard2[1])
+  end
+end
+
+describe '#corrected_prefix_for_file' do
+  it 'should support the simple case (when there is no image name)' do
+    expect(Date2.corrected_prefix_for_file(simple[0])).to eq(simple[2])
+  end
+  it 'should support the simple case (when there is no image name)' do
+    expect(Date2.corrected_prefix_for_file(simpleR[0])).to eq(simpleR[2])
   end
 end
 
@@ -148,5 +194,6 @@ describe '#corrected_prefix_for_file_x' do
   end
   it 'should support a hard date' do
     expect(Date2.corrected_prefix_for_file_x(hard2[0])).to eq(hard2[2])
+    expect(Date2.corrected_prefix_for_file_x(hard1[0])).to eq(hard1[2])
   end
 end
