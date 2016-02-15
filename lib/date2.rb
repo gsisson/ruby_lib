@@ -48,11 +48,17 @@ class Date2
     || self.corrected_prefix_for_PRIVATE(date_or_date_time, @@pattern_date_time_x2, @@pattern_date_x2)
   end
   # private
+  def self.valid_hours(hours)
+    hours >= 0 && hours < 24
+  end
+  def self.valid_minutes_or_seconds(minutes_or_seconds)
+    minutes_or_seconds >= 0 && minutes_or_seconds < 60
+  end
   def self.valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds)
     return true if Date.valid_civil?(year.to_i,month.to_i,day.to_i) &&
-      hours.to_i   >= 0 && hours.to_i   < 24 &&
-      minutes.to_i >= 0 && minutes.to_i < 60 &&
-      seconds.to_i >= 0 && minutes.to_i < 60
+      valid_hours(hours.to_i) &&
+      valid_minutes_or_seconds(minutes.to_i) &&
+      valid_minutes_or_seconds(seconds.to_i)
     false
   end
   def self.extract_prefix_PRIVATE(upper_limit, match, date_or_date_time)
