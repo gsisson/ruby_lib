@@ -61,10 +61,12 @@ class Date2
       date_or_date_time.sub(/#{Regexp.quote(base)}/,'')
   end
   def self.prefix_for_PRIVATE(date_or_date_time, pattern_date_time, pattern_date)
-    if match = date_or_date_time.match(pattern_date_time)
+    match = date_or_date_time.match(pattern_date_time)
+    if match
       return extract_prefix_PRIVATE(@@date_time_prefix_capture_count-1, match, date_or_date_time)
     end
-    if match = date_or_date_time.match(pattern_date)
+    match = date_or_date_time.match(pattern_date)
+    if match
       return extract_prefix_PRIVATE(@@date_prefix_capture_count-1, match, date_or_date_time)
     end
     nil

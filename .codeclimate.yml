@@ -15,7 +15,7 @@ engines:
   rubocop:
     enabled: true
     checks:
-      Rubocop/Lint/AssignmentInCondition:
+      Rubocop/Metrics/ParameterLists:
         enabled: false
 ratings:
   paths:
