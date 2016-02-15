@@ -13,11 +13,11 @@ class Date2
   def self.valid_date_time?(date_time)
     match = date_time.match(@@pattern_date_time1)
     if match
-      year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, ampm = match.captures
+      year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, _ampm = match.captures
     end
     match = date_time.match(@@pattern_date_time2)
     if match
-      month, _x, day, _x, year, _x, hours, _x, minutes, _x, seconds, ampm = match.captures
+      month, _x, day, _x, year, _x, hours, _x, minutes, _x, seconds, _ampm = match.captures
     end
     valid_date_time_PRIVATE?(year, month, day, hours, minutes, seconds)
   end
