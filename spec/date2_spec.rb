@@ -213,3 +213,11 @@ describe '#guess_and_return_date_time_prefix_PRIVATE' do
     expect(prefix).to be(nil)
   end
 end
+  
+describe '#guess_and_remove_date_time_prefix_PRIVATE' do
+  it 'should find the prefix of a date-time-prefixed filename, and remove it' do
+    file_name = '2001-01-19_some_filename'
+    result = Date2.guess_and_remove_date_time_prefix_PRIVATE(file_name)
+    expect(result).to eq('some_filename')
+  end
+end

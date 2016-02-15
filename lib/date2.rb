@@ -117,7 +117,7 @@ class Date2
     base = filename.sub(/^#{Regexp.quote(prefix)}/,'')
     return filename.sub(/#{Regexp.quote(base)}$/,'')
   end
-  def self.XXXXXXXXXXXXXXXXXXXXguess_and_remove_date_time_prefix_PRIVATE(filename)
+  def self.guess_and_remove_date_time_prefix_PRIVATE(filename)
     prefix = guess_and_return_date_time_prefix_PRIVATE(filename)
     return filename if ! prefix 
     base = filename.sub(/^#{Regexp.quote(prefix)}/,'')
@@ -132,10 +132,10 @@ class Date2
     arg
   end
 
-  year='([\dX][\dX][\dX][\dX])'
-  two='([\dX][\dX]?)'
-  d='([-_:\.])' #'([-:\.])'
-  ampm='([ ][AP]M)?'
+  year='([\dX][\dX][\dX][\dX])' # four digits, for years
+  two='([\dX][\dX]?)'           # two digits, for days, or months
+  d='([-_:\.])' #'([-:\.])'     # delimiter of _ - : .
+  ampm='([ ][AP]M)?'            # match an optional AM or PM
   @@pattern_date1        = /^(\d\d\d\d)#{d}(\d\d)#{d}(\d\d)([^\/]*)$/
   @@pattern_date2        = /^(\d\d)#{d}(\d\d)#{d}(\d\d\d\d)([^\/]*)$/
   @@pattern_date_time1   = /^(\d\d\d\d)#{d}(\d\d)#{d}(\d\d)([ -_\.])(\d\d)#{d}(\d\d)#{d}(\d\d)#{ampm}([^\/]*)$/i
