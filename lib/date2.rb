@@ -1,13 +1,25 @@
 class Date2
   def self.valid_date?(date)
-    return true if date.match(@@pattern_date1)
-    return true if date.match(@@pattern_date2)
-    false
+    match = date.match(@@pattern_date1)
+    if match
+      year, _x, month, _x, day, _x = match.captures
+    end
+    match = date.match(@@pattern_date2)
+    if match
+      month, _x, day, _x, year, _x = match.captures
+    end
+    Date.valid_civil?(year.to_i,month.to_i,day.to_i)
   end
   def self.valid_date_time?(date_time)
-    return true if date_time.match(@@pattern_date_time1)
-    return true if date_time.match(@@pattern_date_time2)
-    false
+    match = date_time.match(@@pattern_date_time1)
+    if match
+      year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, ampm = match.captures
+    end
+    match = date_time.match(@@pattern_date_time2)
+    if match
+      month, _x, day, _x, year, _x, hours, _x, minutes, _x, seconds, ampm = match.captures
+    end
+    valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds, ampm)
   end
   def self.valid_date_x?(date)
     return true if date.match(@@pattern_date_x1)
@@ -36,6 +48,13 @@ class Date2
     || self.corrected_prefix_for_PRIVATE(date_or_date_time, @@pattern_date_time_x2, @@pattern_date_x2)
   end
   # private
+  def self.valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds, ampm)
+    return true if Date.valid_civil?(year.to_i,month.to_i,day.to_i) &&
+      hours.to_i   >= 0 && hours.to_i   < 24 &&
+      minutes.to_i >= 0 && minutes.to_i < 60 &&
+      seconds.to_i >= 0 && minutes.to_i < 60
+    false
+  end
   def self.extract_prefix_PRIVATE(upper_limit, match, date_or_date_time)
       prefix=match.captures[0..upper_limit].join
       base = date_or_date_time.sub(prefix,'')
@@ -43,10 +62,10 @@ class Date2
   end
   def self.prefix_for_PRIVATE(date_or_date_time, pattern_date_time, pattern_date)
     if match = date_or_date_time.match(pattern_date_time)
-      return extract_prefix_PRIVATE(11, match, date_or_date_time)
+      return extract_prefix_PRIVATE(@@date_time_prefix_capture_count-1, match, date_or_date_time)
     end
     if match = date_or_date_time.match(pattern_date)
-      return extract_prefix_PRIVATE(4, match, date_or_date_time)
+      return extract_prefix_PRIVATE(@@date_prefix_capture_count-1, match, date_or_date_time)
     end
     nil
   end
@@ -122,12 +141,15 @@ class Date2
   @@pattern_date_time1   = /^(\d\d\d\d)#{d}(\d\d)#{d}(\d\d)([ -_\.])(\d\d)#{d}(\d\d)#{d}(\d\d)#{ampm}([^\/]*)$/i
   @@pattern_date_time2   = /^(\d\d)#{d}(\d\d)#{d}(\d\d\d\d)([ -_\.])(\d\d)#{d}(\d\d)#{d}(\d\d)#{ampm}([^\/]*)$/i
 
-  @date            = "#{two}#{d}#{two}#{d}#{two}#{ampm}"
+  @time            = "#{two}#{d}#{two}#{d}#{two}#{ampm}"
   @year_month_date = "#{year}#{d}#{two}#{d}#{two}"
   @date_month_year = "#{two}#{d}#{two}#{d}#{year}"
 
   @@pattern_date_x1      = /^#{@year_month_date}([^\/]*)$/
   @@pattern_date_x2      = /^#{@date_month_year}([^\/]*)$/
-  @@pattern_date_time_x1 = /^#{@year_month_date}([ -_\.])#{@date}([^\/]*)$/i
-  @@pattern_date_time_x2 = /^#{@date_month_year}([ -_\.])#{@date}([^\/]*)$/i
+  @@pattern_date_time_x1 = /^#{@year_month_date}([ -_\.])#{@time}([^\/]*)$/i
+  @@pattern_date_time_x2 = /^#{@date_month_year}([ -_\.])#{@time}([^\/]*)$/i
+
+  @@date_prefix_capture_count      = ['2001','-','01','-','19'].size
+  @@date_time_prefix_capture_count = ['2001','-','01','-','19','_','00',':','00',':','00','am'].size
 end

@@ -40,8 +40,8 @@ describe '#valid_date?' do
   it 'should reject a date-time with Xs' do
     expect(Date2.valid_date? exes[0]).to be(false)
   end
-  xit 'should reject an invalid date' do
-    @vd1 = '2010-03-12_31.22.33'
+  it 'should reject an invalid date' do
+    @vd1 = '2010-03-39_11.22.33'
     expect(Date2.valid_date? @vd1).to be(false)
   end
 end
@@ -84,8 +84,7 @@ describe '#valid_date_time?' do
     expect(Date2.valid_date_time? simpleR[0]).to be(true)
   end
   it 'should reject an invalid date time' do
-    @vd1 = '201@-03-12_31.22.33'
-    expect(Date2.valid_date_time? @vd1).to be(false)
+    expect(Date2.valid_date_time? '2012-03-12_31.22.33').to be(false)
   end
 end
 
@@ -194,6 +193,23 @@ describe '#corrected_prefix_for_file_x' do
   end
   it 'should support a hard date' do
     expect(Date2.corrected_prefix_for_file_x(hard2[0])).to eq(hard2[2])
-    expect(Date2.corrected_prefix_for_file_x(hard1[0])).to eq(hard1[2])
+    expect(Date2.corrected_prefix_for_file_x(hard1R[0])).to eq(hard1R[2])
+  end
+end
+
+describe '#guess_and_return_date_time_prefix_PRIVATE' do
+  it 'should find the prefix of a date-time-prefixed filename' do
+    prefix = Date2.guess_and_return_date_time_prefix_PRIVATE('2001-01-19_some_filename')
+    expect(prefix).to eq('2001-01-19')
+    prefix = Date2.guess_and_return_date_time_prefix_PRIVATE('2001-01-19')
+    expect(prefix).to eq('2001-01-19')
+    prefix = Date2.guess_and_return_date_time_prefix_PRIVATE('2001-01-19_11.22.33 am filename')
+    expect(prefix).to eq('2001-01-19_11.22.33 am')
+    prefix = Date2.guess_and_return_date_time_prefix_PRIVATE('2001-01-19_11.22_some_filename')
+    expect(prefix).to eq('2001-01-19')
+  end
+  it 'should fail to find the prefix of a non date-time-prefixed filename' do
+    prefix = Date2.guess_and_return_date_time_prefix_PRIVATE('2001-01_some_filename')
+    expect(prefix).to be(nil)
   end
 end
