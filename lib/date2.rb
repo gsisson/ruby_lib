@@ -19,7 +19,7 @@ class Date2
     if match
       month, _x, day, _x, year, _x, hours, _x, minutes, _x, seconds, ampm = match.captures
     end
-    valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds, ampm)
+    valid_date_time_PRIVATE?(year, month, day, hours, minutes, seconds)
   end
   def self.valid_date_x?(date)
     return true if date.match(@@pattern_date_x1)
@@ -48,7 +48,7 @@ class Date2
     || self.corrected_prefix_for_PRIVATE(date_or_date_time, @@pattern_date_time_x2, @@pattern_date_x2)
   end
   # private
-  def self.valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds, ampm)
+  def self.valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds)
     return true if Date.valid_civil?(year.to_i,month.to_i,day.to_i) &&
       hours.to_i   >= 0 && hours.to_i   < 24 &&
       minutes.to_i >= 0 && minutes.to_i < 60 &&
