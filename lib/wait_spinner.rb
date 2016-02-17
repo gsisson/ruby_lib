@@ -1,5 +1,6 @@
+# This class is mostly from the post at
 # http://stackoverflow.com/questions/10262235/printing-an-ascii-spinning-cursor-in-the-console
-
+# It helps with creating a text-based 'wait spinner' in a console app.
 class WaitSpinner
   @@chars = %w{| / - \\}
   def initialize (msg)
@@ -24,7 +25,6 @@ class WaitSpinner
   #     sleep rand(4)+2 # Simulate a task taking an unknown amount of time
   #   }
   #   puts "Done!"
-
   def self.show_wait_spinner(fps=10)
     delay = 1.0/fps
     iter = 0

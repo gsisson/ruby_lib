@@ -1,5 +1,7 @@
 require 'appscript'
 
+# This class has methods for creating tabs in the OSX Terminal utility, naming the tabs
+# and running commands in the tabs.
 class OsxTerminal
   attr_accessor :term
   def initialize

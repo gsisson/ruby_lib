@@ -1,3 +1,8 @@
+# Date2 contains static methods for manipulating filenames passed to the methods as strings.
+# The class is used to generate and manipulate prefixes of filenames that represent dates and/or
+# date-times.  Methods exist to extract the prefixes, check them for validity, and convert them
+# to a standard format.  (this class is used in conjunction with other scripts that rename
+# image files to have standard format date-time prefixes)
 class Date2
   def self.valid_date?(date)
     match = date.match(@@pattern_date1)

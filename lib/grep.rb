@@ -1,3 +1,6 @@
+# The one method in this class, Grep::fgrepf, works similary to the fgrepf utility.  It 'greps'
+# for patterns in one list, that match patterns in another list.  Whereas the fgrepf utility returns
+# the 'grep matches', the fgrepf method here returns both the matches as well as the misses.
 class Grep
   # return two arrays:
   #   first is array of every item in exam_list found in order_list (sorted in the order of order_list)
