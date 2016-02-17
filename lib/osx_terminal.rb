@@ -5,7 +5,7 @@ class OsxTerminal
   def initialize
     extend Appscript
     @term = app('Terminal')
-    tab = @term.windows.first.tabs.last
+    # tab = @term.windows.first.tabs.last
     @set_titles = true
   end
   def tabify(commands)

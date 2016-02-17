@@ -13,9 +13,7 @@ exes   =['2010-XX-XX_09-40-45.avi',       '2010-XX-XX_09-40-45',    '2010-XX-XX_
 hard   =['2010-8-1_9-4-5.png',            '2010-8-1_9-4-5',         '2010-08-01_09.04.05']
 
 simple1=['2010-01-18.png',                '2010-01-18',             '2010-01-18_00.00.00']
-simpled=['2010-01-18.png',                '2010-01-18',             '2010-01-18'         ]
-hard1  =['2010-8-1_img.png',              '2010-8-1',               '2010-08-01'         ]
-hard1R =['8-1-2010_img.png',              '8-1-2010',               '2010-08-01'         ]
+hard1  =['8-1-2010_img.png',              '8-1-2010',               '2010-08-01'         ]
 
 simple2=['2010-01-18 09-40-45_img.png',   '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
 ext2   =['2010-01-18 09-40-45_img.JPG',   '2010-01-18 09-40-45',    '2010-01-18_09.40.45']
@@ -193,7 +191,7 @@ describe '#corrected_prefix_for_file_x' do
   end
   it 'should support a hard date' do
     expect(Date2.corrected_prefix_for_file_x(hard2[0])).to eq(hard2[2])
-    expect(Date2.corrected_prefix_for_file_x(hard1R[0])).to eq(hard1R[2])
+    expect(Date2.corrected_prefix_for_file_x(hard1[0])).to eq(hard1[2])
   end
 end
 
