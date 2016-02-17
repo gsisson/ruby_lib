@@ -1,5 +1,8 @@
 require 'rspec'
 require 'spec_helper'
+# #require 'fakefs'
+# require 'fakefs/safe'
+# #require 'fakefs/spec_helpers'
 require_relative '../lib/dir2'
 
 describe '#date_time_prefix?' do
@@ -36,7 +39,22 @@ describe '#date_prefix?' do
   end
 end
 
-describe '#glob_i' do
-  xit 'should return upper-case, and lower-case files' do
+describe '#globi', fakefs: true do
+  it 'On Windows, should return both upper-case, and lower-case files' do
+    dir='sub_dir'
+    Dir.mkdir(dir)
+    Dir.chdir(dir)
+    file_names=%w{file1 File2 FILE3}
+    file_names.each do |fn|
+      File.open(fn,'w') { |f|f.puts(fn) }
+    end
+    expect(Dir2.globi('*')).to match_array(file_names)
+    if RUBY_PLATFORM =~ /cygwin/
+      puts 'testing on windows'
+      expect(Dir2.globi('*')).to_not match_array(Dir.glob('*'))
+    else
+      puts 'testing on non-windows'
+      expect(Dir2.globi('*')).to     match_array(Dir.glob('*'))
+    end
   end
 end
