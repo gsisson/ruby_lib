@@ -3,33 +3,33 @@ require_relative 'date2'
 # Some useful methods on directories
 class Dir2
   # Simpler way to glob case-insensitively
-  def self.globi(pattern)
+  def self.glob_i(pattern)
     Dir.glob(pattern, File::FNM_CASEFOLD)    
   end
   # return all jpgs, case insensitive
-  def self.globi_jpgs
-    globi("*.{jpg,jpeg}")
+  def self.glob_i_jpgs
+    glob_i("*.{jpg,jpeg}")
   end
   # return all jpgs+cr2 files, case insensitive
-  def self.globi_jpgs_cr2s
-    globi("*.{jpg,jpeg,cr2}")
+  def self.glob_i_jpgs_cr2s
+    glob_i("*.{jpg,jpeg,cr2}")
   end
   # return all images, case insensitive
-  def self.globi_images
-    globi("*.{jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe}")
+  def self.glob_i_images
+    glob_i("*.{jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe}")
   end
-  def self.globi_images_and_text
-    globi("*.{jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe,txt}")
+  def self.glob_i_images_and_text
+    glob_i("*.{jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe,txt}")
   end
   # return all that are files
   def self.files(glob_arg)
-    Dir2.globi(glob_arg).select do |f|
+    Dir2.glob_i(glob_arg).select do |f|
       File.exist?(f) && !File.symlink?(f)
     end
   end
   # return all that are directories or symbolic links
   def self.dir_or_symlink(glob_arg)
-    Dir2.globi(glob_arg).select do |f|
+    Dir2.glob_i(glob_arg).select do |f|
       File.symlink?(f) || Dir.exist?(f)
     end
   end
