@@ -2,6 +2,13 @@ require_relative 'date2'
 
 # Some useful methods on directories
 class Dir2
+  # Useful to find just file types
+  def symlink_or_directory?(f)
+    # doesn't seem to work on Mac ???
+    #  File.symlink?(f)
+    require_relative 'file_symlink'
+    return File.symlink?(f) || File.directory?(f)
+  end
   # Simpler way to glob case-insensitively
   def self.glob_i(pattern)
     Dir.glob(pattern, File::FNM_CASEFOLD)    
@@ -69,8 +76,7 @@ class Dir2
   # ex: Dir2.files_in_dirs( [ '.', '.ssh' ] )
   @entries = {}
   def self.files_in_dirs(dir_array, options = {})
-    flag = options[:flag]
-    return nil if ! validate_dirs_or_symbols(dir_array)
+    return nil if ! validate_dirs_or_symbols_PRIVATE(dir_array)
     all_files=[]
     dir_array.each do |d|
       d=File.absolute_path(d)
@@ -82,10 +88,9 @@ class Dir2
         puts files.size if options[:verbose]
       end
       files.select! do |f|
-        # doesn't seem to work on Mac ???
-        #   File.symlink?(f) \
-           ! File.symlink?(f) \
-        && ! File.directory?(f)
+        # TODO: why not just call File.exist?() to ensure getting files, and no symlinks?
+        #       ...I think it doesn't correctly return false for File.exist?(some_symlink)
+        ! symlink_or_directory?(f)
       end
       if all_files.size == 0
         #puts "avoiding .push()..."
@@ -100,10 +105,8 @@ class Dir2
     end
     all_files.sort!
   end
-
-  private # private private private private private private private private private
-
-  def self.validate_dirs_or_symbols(dir_array)
+  # private private private private private private private private private
+  def self.validate_dirs_or_symbols_PRIVATE(dir_array)
     prob_dir = []
     dir_array.each do |d|
       if ! d.instance_of? Symbol
