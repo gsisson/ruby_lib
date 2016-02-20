@@ -18,18 +18,11 @@ class Date2
   def self.valid_date_time?(date_time)
     match = date_time.match(@@pattern_date_time1)
     if match
-#     year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, _ampm = match.captures
-      results = match.captures
-      year    = results[0]
-      month   = results[2]
-      day     = results[4]
-      hours   = results[6]
-      minutes = results[8]
-      seconds = results[10]
+      year, month, day, hours, minutes, seconds = pull_date_time_captures_PRIVATE(match.captures)
     end
     match = date_time.match(@@pattern_date_time2)
     if match
-      month, _x, day, _x, year, _x, hours, _x, minutes, _x, seconds, _ampm = match.captures
+      year, month, day, hours, minutes, seconds = pull_date_time_captures_PRIVATE(match.captures, american_date_format: true)
     end
     valid_date_time_PRIVATE?(year, month, day, hours, minutes, seconds)
   end
@@ -59,19 +52,31 @@ class Date2
        self.corrected_prefix_for_PRIVATE(date_or_date_time, @@pattern_date_time_x1, @@pattern_date_x1) \
     || self.corrected_prefix_for_PRIVATE(date_or_date_time, @@pattern_date_time_x2, @@pattern_date_x2)
   end
-  # private
-  def self.valid_hours(hours)
+  # private private private private private private private private private private private private
+  def self.pull_date_time_captures_PRIVATE(captures, options = {})
+    year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, _ampm = captures
+    if options[:american_date_format] == true
+      # YEAR-MM-DD
+      #   MM-DD-YEAR  american
+      month_copy = month
+      month = year
+      year  = day
+      day   = month_copy
+    end
+    return [year,  month, day,  hours, minutes, seconds]
+  end
+  def self.valid_hours_PRIVATE(hours)
     hours >= 0 && hours < 24
   end
-  def self.valid_minutes_or_seconds(minutes_or_seconds)
+  def self.valid_minutes_or_seconds_PRIVATE(minutes_or_seconds)
     minutes_or_seconds >= 0 && minutes_or_seconds < 60
   end
   # rubocop:disable Metrics/ParameterLists
   def self.valid_date_time_PRIVATE?(year, month, day, hours, minutes,seconds)
     return true if Date.valid_civil?(year.to_i,month.to_i,day.to_i) &&
-      valid_hours(hours.to_i) &&
-      valid_minutes_or_seconds(minutes.to_i) &&
-      valid_minutes_or_seconds(seconds.to_i)
+      valid_hours_PRIVATE(hours.to_i) &&
+      valid_minutes_or_seconds_PRIVATE(minutes.to_i) &&
+      valid_minutes_or_seconds_PRIVATE(seconds.to_i)
     false
   end
   def self.extract_prefix_PRIVATE(upper_limit, match, date_or_date_time)

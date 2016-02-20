@@ -65,8 +65,8 @@ class Dir2
     date_prefix(directory) ? true : false
   end
   # return the date prefix of the passed string
-  #  "2005-23-10_DEF" => true
-  #  "2005-23-XX"     => false
+  #  "2005-23-10_DEF" => "2005-23-10"
+  #  "2005-23-XX"     => nil
   def self.date_prefix(directory)
     dtp=File.basename(directory)[0..9]
     return nil if ! Date2.valid_date?(dtp)
