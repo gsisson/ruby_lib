@@ -40,21 +40,6 @@ describe '#date_prefix?' do
   end
 end
 
-class WorkInSubDir
-  def initialize()
-    puts 'WorkInSubDir#initializing'
-    @tmp_dir="_tmp_dir_#{rand(10000)}"
-    @start_dir=Dir.pwd
-    Dir.mkdir(@tmp_dir)
-    Dir.chdir(@tmp_dir)
-  end
-  def cleanup()
-    puts 'WorkInSubDir#cleanup'
-    Dir.chdir(@start_dir)
-    FileUtils.rm_r(@tmp_dir)
-  end
-end
-
 class WorkInCleanSubDir
   def self.go()
     @tmp_dir="_tmp_dir_#{rand(10000)}"

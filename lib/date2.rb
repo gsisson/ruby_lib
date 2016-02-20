@@ -18,7 +18,14 @@ class Date2
   def self.valid_date_time?(date_time)
     match = date_time.match(@@pattern_date_time1)
     if match
-      year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, _ampm = match.captures
+#     year, _x, month, _x, day, _x, hours, _x, minutes, _x, seconds, _ampm = match.captures
+      results = match.captures
+      year    = results[0]
+      month   = results[2]
+      day     = results[4]
+      hours   = results[6]
+      minutes = results[8]
+      seconds = results[10]
     end
     match = date_time.match(@@pattern_date_time2)
     if match
