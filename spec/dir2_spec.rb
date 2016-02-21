@@ -1,6 +1,5 @@
-require 'fileutils'
-require 'rspec'
 require 'spec_helper'
+require 'fileutils'
 # #require 'fakefs'
 # require 'fakefs/safe'
 # #require 'fakefs/spec_helpers'
