@@ -3,7 +3,7 @@ require_relative 'date2'
 # Some useful methods on directories
 class Dir2
   # Useful to find just file types
-  def symlink_or_directory?(f)
+  def self.symlink_or_directory?(f)
     # doesn't seem to work on Mac ???
     #  File.symlink?(f)
     require_relative 'file_symlink'
@@ -22,11 +22,11 @@ class Dir2
     glob_i("*.{jpg,jpeg,cr2}")
   end
   # return all images, case insensitive
-  def self.glob_i_images
-    glob_i("*.{jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe}")
+  def self.glob_i_images_movies
+    glob_i("*.{bmp,jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe}")
   end
-  def self.glob_i_images_and_text
-    glob_i("*.{jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe,txt}")
+  def self.glob_i_images_movies_and_text
+    glob_i("*.{bmp,jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe,txt}")
   end
   # return all that are files
   def self.files(glob_arg)

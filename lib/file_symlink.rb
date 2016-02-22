@@ -6,15 +6,15 @@ class << File
   alias_method :old_symlink,  :symlink
 
   # Replace the built-in #symlink, so that Windows can be handled
-  def symlink(old_name, new_name)
+  def symlink(existing_name, new_name)
     if RUBY_PLATFORM =~ /mswin32|cygwin|mingw|bccwin/
       #windows mklink syntax is reverse of unix ln -s
       #windows mklink is built into cmd.exe
       _stdin, _stdout, _stderr, wait_thr =
-        Open3.popen3('cmd.exe', "/c mklink /d #{new_name.tr('/','\\')} #{old_name.tr('/','\\')}")
+        Open3.popen3('cmd.exe', "/c mklink /d #{new_name.tr('/','\\')} #{existing_name.tr('/','\\')}")
       wait_thr.value.exitstatus
     else
-      self.old_symlink(old_name, new_name)
+      self.old_symlink(existing_name, new_name)
     end
   end
   # Replace the built-in #symlink?, so that Windows can be handled
