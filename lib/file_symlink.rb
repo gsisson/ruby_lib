@@ -4,6 +4,7 @@ require 'open3'
 
 class << File
   alias_method :old_symlink,  :symlink
+  alias_method :old_symlink?, :symlink?
 
   # Replace the built-in #symlink, so that Windows can be handled
   def symlink(existing_name, new_name)
