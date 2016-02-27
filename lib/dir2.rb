@@ -42,6 +42,7 @@ class Dir2
   end
   # fix Dir.pwd, which returns "/cygdrive/c/" instead of "c:/"
   def self.pwd
+    # for RUBY_PLATFORM =~ /cygwin/
     Dir.pwd.sub(/\/cygdrive\/([a-z])/,'\1:')
   end
   # does the passed string contain a date-time prefix?

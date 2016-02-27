@@ -171,6 +171,16 @@ describe 'Dir2' do
     dirs
   end
 
+  def create_dirs_with_files()
+    files=%w{file1 file2 file3}
+    dirs = create_dirs.each do |dir|
+      files.each do |file|
+        FileUtils.touch("#{Dir.pwd}/#{dir}/#{file}")
+      end
+    end
+    return dirs
+  end
+
   let(:symlinks) {
     {
       'real_file_1' => 'sym_link_file_1',
@@ -218,6 +228,16 @@ describe 'Dir2' do
           expect(dir2_pwd).to_not  match(%r{/cygdrive/})     # /cygdrive/
           expect(dir2_pwd).to      match(%r{^[[:alpha:]]:/}) # c:/
         end
+      end
+    end
+  end
+
+  describe '#files_in_dirs' do
+    it 'should return non-nil if all directories exist, and nil if any dirs do not exist' do
+      WorkInCleanSubDir.go do
+        dirs=create_dirs_with_files
+        expect(Dir2.files_in_dirs(dirs))             .to_not be(nil)
+        expect(Dir2.files_in_dirs(dirs << 'bad_dir')).to     be(nil)
       end
     end
   end
