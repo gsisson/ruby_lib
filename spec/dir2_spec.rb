@@ -4,13 +4,13 @@ require 'fileutils'
 # require 'fakefs/safe'
 # #require 'fakefs/spec_helpers'
 require_relative '../lib/dir2'
-require_relative '../lib/file_symlink'
+require_relative '../helpers/work_in_clean_subdir'
 
 describe 'Dir2' do
 
   describe '#symlink_or_directory?' do
     it 'should return true for a directory' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         expect(Dir2.symlink_or_directory?('/')).to be(true)
       end
     end
@@ -73,36 +73,19 @@ describe 'Dir2' do
     end
   end
   
-  class WorkInCleanSubDir
-    def self.go()
-      begin
-        @tmp_dir="_tmp_dir_#{rand(10000)}"
-        @start_dir=Dir.pwd
-        Dir.mkdir(@tmp_dir)
-        Dir.chdir(@tmp_dir)
-        yield
-      ensure
-        Dir.chdir(@start_dir)
-        FileUtils.rm_r(@tmp_dir)
-      end
-    end
-  end
-  
   # can't use "fakefs: true" here, although I'd like to, because it doesn't emulate
   # the case-sensitive globbing that happens by default on Windows, but not on Mac.
   # So, must create a temp dir and work in it, and clean it up afterwards.
   describe '#glob_i' do
     it 'should return both upper-case, and lower-case files' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         file_names=%w{file1 File2 FILE3}
         file_names.each { |fn| FileUtils.touch(fn) }
         expect(Dir2.glob_i('*')).to match_array(file_names)
         if RUBY_PLATFORM =~ /cygwin/
-          puts 'testing on windows'
           # on windows, Dir.glob acts in a case-sensitive way, so 'f*' won't match File2 or FILE3
           expect(Dir2.glob_i('f*')).to_not match_array(Dir.glob('f*'))
         else
-          puts 'testing on non-windows'
           # on non-windows, Dir.glob acts in a case-INsensitive way, so 'f*' WILL match File2 or FILE3
           expect(Dir2.glob_i('f*')).to match_array(Dir.glob('f*'))
         end
@@ -125,7 +108,7 @@ describe 'Dir2' do
 
   describe '#glob_i_jpgs' do
     it 'should return jpg and jpeg files' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         expected_files = jpg
         file_names.each { |fn| FileUtils.touch(fn) }
         expect(Dir2.glob_i_jpgs()).to match_array(expected_files)
@@ -135,7 +118,7 @@ describe 'Dir2' do
 
   describe '#glob_i_jpgs_cr2s' do
     it 'should return jpg, jpeg and cr2 files' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         expected_files = jpg_cr2
         file_names.each { |fn| FileUtils.touch(fn) }
         expect(Dir2.glob_i_jpgs_cr2s()).to match_array(expected_files)
@@ -145,7 +128,7 @@ describe 'Dir2' do
 
   describe '#glob_i_jmages_movies' do
     it 'should return image and movie files' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         expected_files = image + movie
         file_names.each { |fn| FileUtils.touch(fn) }
         expect(Dir2.glob_i_images_movies()).to match_array(expected_files)
@@ -155,7 +138,7 @@ describe 'Dir2' do
 
   describe '#glob_i_images_movies_and_text' do
     it 'should return image, movies, and text files' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         expected_files = image + movie + text
         file_names.each { |fn| FileUtils.touch(fn) }
         expect(Dir2.glob_i_images_movies_and_text()).to match_array(expected_files)
@@ -200,7 +183,7 @@ describe 'Dir2' do
 
   describe '#files' do
     it 'should return files, but not include symplinks' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         files = create_symlinks()
         expect(Dir2.files('*')).to match_array(files)
       end
@@ -209,7 +192,7 @@ describe 'Dir2' do
 
   describe '#dir_or_symlink' do
     it 'should return dirs or symlinks, but not regular files' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         create_symlinks()
         dirs = create_dirs()
         expect(Dir2.dir_or_symlink('*')).to match_array(symlinks.values+dirs)
@@ -219,14 +202,19 @@ describe 'Dir2' do
 
   describe '#pwd' do
     it 'on Windows, it should return a directory, starting not with "cygdrive", but with a drive letter' do
-      if RUBY_PLATFORM =~ /cygwin/
-        WorkInCleanSubDir.go do
-          dir_pwd  = Dir.pwd
-          dir2_pwd = Dir2.pwd
+      WorkInCleanSubdir.go do
+        dir_pwd  = Dir.pwd
+        dir2_pwd = Dir2.pwd
+        if RUBY_PLATFORM =~ /cygwin/
           expect(dir_pwd) .to      match(%r{/cygdrive/})     # /cygdrive/
           expect(dir_pwd) .to_not  match(%r{^[[:alpha:]]:/}) # c:/
           expect(dir2_pwd).to_not  match(%r{/cygdrive/})     # /cygdrive/
           expect(dir2_pwd).to      match(%r{^[[:alpha:]]:/}) # c:/
+        else
+          expect(dir_pwd) .to_not  match(%r{/cygdrive/})     # /cygdrive/
+          expect(dir_pwd) .to_not  match(%r{^[[:alpha:]]:/}) # c:/
+          expect(dir2_pwd).to_not  match(%r{/cygdrive/})     # /cygdrive/
+          expect(dir2_pwd).to_not  match(%r{^[[:alpha:]]:/}) # c:/
         end
       end
     end
@@ -234,7 +222,7 @@ describe 'Dir2' do
 
   describe '#files_in_dirs' do
     it 'should return non-nil if all directories exist, and nil if any dirs do not exist' do
-      WorkInCleanSubDir.go do
+      WorkInCleanSubdir.go do
         dirs=create_dirs_with_files
         expect(Dir2.files_in_dirs(dirs))             .to_not be(nil)
         expect(Dir2.files_in_dirs(dirs << 'bad_dir')).to     be(nil)
