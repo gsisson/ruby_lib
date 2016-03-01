@@ -5,21 +5,21 @@ class String
     "\e[#{color_code}m#{self}\e[0m"
   end
   def black;          "\033[0;30m#{self}\033[0m"; end
-  def black_bold;    "\033[1;30m#{self}\033[0m"; end
+  def black_bold;     "\033[1;30m#{self}\033[0m"; end
   def red;            "\033[0;31m#{self}\033[0m"; end
-  def red_bold;      "\033[1;91m#{self}\033[0m"; end
+  def red_bold;       "\033[1;91m#{self}\033[0m"; end
   def green;          "\033[0;32m#{self}\033[0m"; end
-  def green_bold;    "\033[1;32m#{self}\033[0m"; end
+  def green_bold;     "\033[1;32m#{self}\033[0m"; end
   def brown;          "\033[0;33m#{self}\033[0m"; end
-  def brown_bold;    "\033[1;33m#{self}\033[0m"; end
+  def brown_bold;     "\033[1;33m#{self}\033[0m"; end
   def blue;           "\033[0;34m#{self}\033[0m"; end
-  def blue_bold;     "\033[1;34m#{self}\033[0m"; end
+  def blue_bold;      "\033[1;34m#{self}\033[0m"; end
   def magenta;        "\033[0;35m#{self}\033[0m"; end
-  def magenta_bold;  "\033[1;35m#{self}\033[0m"; end
+  def magenta_bold;   "\033[1;35m#{self}\033[0m"; end
   def cyan;           "\033[0;36m#{self}\033[0m"; end
-  def cyan_bold;     "\033[1;36m#{self}\033[0m"; end
+  def cyan_bold;      "\033[1;36m#{self}\033[0m"; end
   def gray;           "\033[0;37m#{self}\033[0m"; end
-  def gray_bold;     "\033[1;37m#{self}\033[0m"; end
+  def gray_bold;      "\033[1;37m#{self}\033[0m"; end
   def bg_black;       "\033[0;40m#{self}\033[0m"; end
   def bg_red;         "\033[1;41m#{self}\033[0m"; end
   def bg_green;       "\033[0;42m#{self}\033[0m"; end

@@ -1,4 +1,5 @@
 # Print the stack frames, but not the frames from gems, or built-in ruby libraries
+
 class StackTrace
   # usage example:
   #   require 'stack_trace'
