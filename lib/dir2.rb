@@ -77,7 +77,16 @@ class Dir2
   # ex: Dir2.files_in_dirs( [ '.', '.ssh' ] )
   @entries = {}
   def self.files_in_dirs(dir_array, options = {})
-    return nil if ! validate_dirs_or_symbols_PRIVATE(dir_array)
+    prob_dirs = validate_dirs_or_symbols_PRIVATE(dir_array)
+    if prob_dirs.size > 0
+      if options[:verbose]
+        puts "ERROR: directories do not exist:"
+        prob_dirs.each do |d|
+          puts "  #{d}"
+        end
+      end
+      return nil 
+    end
     all_files=[]
     dir_array.each do |d|
       d=File.absolute_path(d)
@@ -108,19 +117,13 @@ class Dir2
   end
   # private private private private private private private private private
   def self.validate_dirs_or_symbols_PRIVATE(dir_array)
-    prob_dir = []
+    prob_dirs = []
     dir_array.each do |d|
       if ! d.instance_of? Symbol
-        prob_dir << d if ! Dir.exist? d
+        prob_dirs << d if ! Dir.exist? d
       end
     end
-    if prob_dir.size > 0
-      puts "ERROR: directories do not exist:"
-      prob_dir.each do |d|
-        puts "  #{d}"
-      end
-      return nil
-    end
-    true
+    prob_dirs
   end
 end
+
