@@ -97,10 +97,13 @@ class Dir2
         files = @entries[d] = Dir.entries(d)
         puts files.size if options[:verbose]
       end
-      files.select! do |f|
-        # TODO: why not just call File.exist?() to ensure getting files, and no symlinks?
-        #       ...I think it doesn't correctly return false for File.exist?(some_symlink)
-        ! symlink_or_directory?(f)
+      fast = true
+      if ! fast
+        files.select! do |f|
+          # TODO: why not just call File.exist?() to ensure getting files, and no symlinks?
+          #       ...I think it doesn't correctly return false for File.exist?(some_symlink)
+          ! symlink_or_directory?(f)
+        end
       end
       if all_files.size == 0
         #puts "avoiding .push()..."
