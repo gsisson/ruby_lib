@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'fileutils'
 # #require 'fakefs'
-# require 'fakefs/safe'
+#  require 'fakefs/safe'
 # #require 'fakefs/spec_helpers'
 require_relative '../lib/dir2'
 require_relative '../helpers/work_in_clean_subdir'

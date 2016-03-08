@@ -23,7 +23,18 @@ module Friendly
       raise
     end
   end
-  # TODO: move StackTrace class into here...
-  # def self.stack()
-  # end
+  # usage example:
+  #   require 'friendly'
+  #   Friendly.stack_trace(' => ')
+  # output:
+  #   " => ~/somedir/somepath/some_code_file.rb:16:in `method_1'"
+  #   " => ~/somedir/somepath/some_code_file.rb:19:in `method_2'"
+  #   " => ~/somedir/somepath/some_code_file.rb:22:in `method_3'"
+  def self.stack_frames(prefix = '')
+    caller.select do |f|
+      f !~ %r{/.rbenv/}
+    end.map do |f|
+      f.sub(%r{#{ENV['HOME']}},'~').sub(/^/,prefix)
+    end
+  end
 end
