@@ -1,6 +1,14 @@
-# This class is mostly from the post at
-# http://stackoverflow.com/questions/10262235/printing-an-ascii-spinning-cursor-in-the-console
-# It helps with creating a text-based 'wait spinner' in a console app.
+# WaitSpinner helps with creating a text-based 'wait spinner' in a console app.
+# - This class is mostly from the post at
+#   http://stackoverflow.com/questions/10262235/printing-an-ascii-spinning-cursor-in-the-console
+# 
+# Usage;
+#   spinner = WaitSpinner.new
+#   while true do
+#     spinner.spin
+#     long.running(operation)
+#   end
+#   spinner.stop
 class WaitSpinner
   @@chars = %w{| / - \\}
   def initialize (msg)
@@ -41,5 +49,3 @@ class WaitSpinner
     }                # Use the blocks return value as the methods
   end
 end
-
-
