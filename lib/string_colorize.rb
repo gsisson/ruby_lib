@@ -10,8 +10,8 @@ class String
   def red_bold;       "\033[1;91m#{self}\033[0m"; end
   def green;          "\033[0;32m#{self}\033[0m"; end
   def green_bold;     "\033[1;32m#{self}\033[0m"; end
-  def brown;          "\033[0;33m#{self}\033[0m"; end
-  def brown_bold;     "\033[1;33m#{self}\033[0m"; end
+  def brown;          "\033[0;33m#{self}\033[0m"; end # yellow
+  def brown_bold;     "\033[1;33m#{self}\033[0m"; end # yellow
   def blue;           "\033[0;34m#{self}\033[0m"; end
   def blue_bold;      "\033[1;34m#{self}\033[0m"; end
   def magenta;        "\033[0;35m#{self}\033[0m"; end
