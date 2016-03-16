@@ -5,6 +5,14 @@ Friendly.require 'appscript','rb-appscript',__FILE__
 # and running commands in the tabs.
 class OsxTerminal
   attr_accessor :term
+  def example
+    app_commands = [ ["one", "ls"],   # tab 'one' will run 'ls'
+                     ["two", "ls -l"] # tab 'two' will run 'ls -l'
+                   ]
+    is_osx = RUBY_PLATFORM =~ /darwin/
+    terminal = is_osx ? OsxTerminal.new : raise("unsupported platform: '#{RUBY_PLATFORM}'")
+    terminal.tabify app_commands
+  end
   def initialize
     extend Appscript
     @term = app('Terminal')
@@ -35,7 +43,6 @@ class OsxTerminal
     app("System Events").application_processes[ "Terminal.app" ].keystroke("n", :using => :command_down)
   end
   def make_tab(title=nil, new_tab = true) #-------------------------------------------------
-puts "make_tab(title:#{title},new_tab:#{new_tab})"
     @term.activate app("System Events").application_processes[ "Terminal.app" ].keystroke("t", :using => :command_down) if new_tab
     tab = @term.windows.first.tabs.last
     tab.selected.set true
