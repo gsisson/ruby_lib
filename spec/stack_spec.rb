@@ -1,8 +1,8 @@
 require 'spec_helper'
-require_relative '../lib/friendly'
+require_relative '../lib/stack'
 
 def level3
-  Friendly.stack_frames()
+  Stack.frames()
 end
 
 def level2
@@ -14,7 +14,7 @@ def level1
 end
 
 describe "Friendly" do
-  describe '#stack_frames' do
+  describe '#frames' do
     it 'should return stack frames' do
       frames = level1
       # ~/some/path/stack_trace_spec.rb:5:in `level3'

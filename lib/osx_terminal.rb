@@ -1,5 +1,5 @@
-require_relative 'friendly'
-Friendly.require 'appscript','rb-appscript',__FILE__
+require_relative 'required'
+required 'appscript', 'rb-appscript'
 
 # This class has methods for creating tabs in the OSX Terminal utility, naming the tabs
 # and running commands in the tabs.
