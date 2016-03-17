@@ -1,3 +1,5 @@
+require 'pathname'
+
 class Pathname
   # Converts cygwin paths to c:/ type paths
   # ex: cygwin_to_dos('/cygdrive/c/tmp') => 'c:/tmp'
@@ -18,11 +20,10 @@ class Pathname
   def self.tildize(path)
     newpath = File.absolute_path(path)
     newpath = cygwin_to_dos(newpath)
-    r=/#{ENV['HOME']}/i
+    r=/^#{ENV['HOME']}/i
     if newpath !~ r
       return path
     end
-    newpath = newpath.sub(r,'~')
-    newpath
+    newpath.sub(r,'~')
   end
 end
