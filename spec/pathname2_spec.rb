@@ -41,7 +41,8 @@ describe 'Pathname' do
         expect(Pathname.tildize(path)).to eq(path)
       end
     end
-    require_relative './pathname2_spec_WIN.rb' if RUBY_PLATFORM =~ /mswin32|cygwin|mingw|bccwin/
   end
 
 end
+
+require_relative './pathname2_spec_WIN.rb' if RUBY_PLATFORM =~ /mswin32|cygwin|mingw|bccwin/
