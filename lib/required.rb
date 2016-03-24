@@ -8,7 +8,7 @@
 #   required 'appscript',      'rb-appscript'
 #   required 'some_ruby_file'
 def required(gem_name, gem_install_name = nil)
-  Required::require gem_name, gem_install_name
+  Required::required gem_name, gem_install_name
 end
 
 require_relative 'pathname2'
@@ -16,9 +16,9 @@ require_relative 'pathname2'
 module Required
   BOLD_RED="\033[1m\033[31m"
   EXIT_COLOR="\033[0m"
-  def self.require gem_name, gem_install_name
+  def self.required gem_name, gem_install_name
     begin
-      Kernel.require gem_name
+      require gem_name
     rescue LoadError => e
       # caller[2] should be something like: "./some_file.rb:80:in '<main>'"
       # we just need to extract the file name and line number
