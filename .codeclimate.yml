@@ -17,6 +17,8 @@ engines:
     checks:
       Rubocop/Metrics/ParameterLists:
         enabled: false
+  shellcheck:
+    enabled: true
 ratings:
   paths:
   - Gemfile.lock

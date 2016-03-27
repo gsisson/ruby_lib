@@ -10,3 +10,5 @@ group :test do
   gem 'codeclimate-test-reporter', require: false
   gem 'simplecov', '~> 0.11.1',    require: false
 end
+
+gem 'colorize'
