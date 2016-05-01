@@ -169,22 +169,22 @@
   end
   describe 'OBJECT matchers' do
     it "expect('hi').to  be_instance_of(String)    # exact object type matcher " do
-        expect('hi').to  be_instance_of(String)   
+        expect('hi').to  be_instance_of(String)
     end
     it "expect('hi').to  be_an_instance_of(String) #   alias" do
         expect('hi').to  be_an_instance_of(String)
     end
     it "expect('hi').to  be_a(String)              # is-a object type matcher" do
-        expect('hi').to  be_a(String)             
+        expect('hi').to  be_a(String)
     end
     it "expect('hi').to  be_a_kind_of(String)      #   alias" do
-        expect('hi').to  be_a_kind_of(String)     
+        expect('hi').to  be_a_kind_of(String)
     end
     it "expect('hi').to  be_kind_of(String)        #   alias" do
-        expect('hi').to  be_kind_of(String)       
+        expect('hi').to  be_kind_of(String)
     end
     it "expect([1,2]).to be_an(Array)              #   alias" do
-        expect([1,2]).to be_an(Array)             
+        expect([1,2]).to be_an(Array)
     end
   end
   describe "RESPOND_TO message matchers" do
@@ -264,7 +264,7 @@
     it "=> they match when events change object attributes (calls test before block, then after block)" do end
     it "expect {     array << 1 }.to change(array, :empty?).from(true).to(false) # calls array.empty?()" do
         array = []
-        expect {     array << 1 }.to change(array, :empty?).from(true).to(false) 
+        expect {     array << 1 }.to change(array, :empty?).from(true).to(false)
     end
     it "expect { hits.increment }.to change(hits,  :count) .from(0)   .to(1)     # calls hits.count()" do
         expect { hits.increment }.to change(hits,  :count) .from(0)   .to(1)
@@ -277,19 +277,19 @@
     it "=> must change the value inside the block" do end
     it "x = 10" do end
     it "expect { x += 1 }.to change {x}.from(10).to(11)" do
-        expect { x += 1 }.to change {x}.from(10).to(11)     
+        expect { x += 1 }.to change {x}.from(10).to(11)
     end
     it "expect { x += 1 }.to change {x}.by(1)" do
-        expect { x += 1 }.to change {x}.by(1)               
+        expect { x += 1 }.to change {x}.by(1)
     end
     it "expect { x += 1 }.to change {x}.by_at_least(1)" do
-        expect { x += 1 }.to change {x}.by_at_least(1)      
+        expect { x += 1 }.to change {x}.by_at_least(1)
     end
     it "expect { x += 1 }.to change {x}.by_at_most(1)" do
-        expect { x += 1 }.to change {x}.by_at_most(1)       
+        expect { x += 1 }.to change {x}.by_at_most(1)
     end
     it "expect { x += 1 }.to change { x % 2 }.from(0).to(1)" do
-        expect { x += 1 }.to change { x % 2 }.from(0).to(1) 
+        expect { x += 1 }.to change { x % 2 }.from(0).to(1)
     end
   end
   describe "OBSERVATIONAL matchers - for exceptions" do
@@ -328,9 +328,8 @@
         expect {  warn('issue') }.to output(/issue/).to_stderr
     end
   end
-  
   describe "COMPOUND expectations (and, or, &, |)" do
-        array=[1,2,3,4]    
+        array=[1,2,3,4]
     it "array=[1,2,3,4]                               " do end
     it "expect(array).to start_with(1).and end_with(4)" do
         expect(array).to start_with(1).and end_with(4)
@@ -349,7 +348,6 @@
     end
     it ".                  ^^ " do end
   end
-  
   describe "COMPOSING matchers, that accept matchers as args (rspec3)" do
     describe "all" do
       it "array = [1,2,3]" do end
@@ -378,7 +376,6 @@
           expect(hash).to include(:a => be > 0, :b => be_within(2).of(4))
       end
     end
-    
     describe "aliases to make matchers read better with noun-based phrases (not verb-based)" do
       it "start_with        => a_string_starting_with" do end
       it "end_with          => a_string_ending_with" do end
@@ -393,8 +390,8 @@
         it "__include( a_string_matching(/a.a.a/) ) & " do end
         it "__end_with( a_string_ending_with('y') )" do
             fruits = ['apple', 'banana', 'cherry']
-            expect(fruits).to start_with( a_string_starting_with('a') ) & 
-              include( a_string_matching(/a.a.a/) ) & 
+            expect(fruits).to start_with( a_string_starting_with('a') ) &
+              include( a_string_matching(/a.a.a/) ) &
               end_with( a_string_ending_with('y') )
         end
       end
