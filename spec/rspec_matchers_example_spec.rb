@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+
+  class String
+    def unicode_i
+      "\u2063#{self[1..-1]}"
+    end
+  end
+
   class O
     attr_accessor :count
     def initialize; @count = 0; end
@@ -12,34 +20,39 @@
   hits = customer = this_object = O.new
 
   describe "Chapter 4" do
-    describe "LOOSE equality with #eq (uses #==)" do
-      it "expect('a').to eq('a')" do
+    describe "LOOSE equality with #eq or 'be() [uses #==]" do
+      it "expect('a').to eq('a')" do end
+      it "·              ^^" do
           expect('a').to eq('a')
       end
-      it "expect('a').to be == 'a' # synonym for #eq with no parens, rarely used" do
+      it "expect('a').to be == 'a' # 'be' with NO PARENS: synonym for #eq, rarely used" do end
+      it "·              ^^^^^                 ^^^^^^^^^! ^^^^^^^          ^^^^^^^^^^^!" do
           expect('a').to be == 'a'
       end
       it 'expect( 1 ).to eq(1.0)   # different types, but "close enough"' do
           expect( 1 ).to eq(1.0)
       end
     end
-    describe "VALUE equality with #eql (uses #eql?)" do
-      it "expect('a').to     eql('a') # value equality" do
+    describe "VALUE equality with #eql [uses #eql?]" do
+      it "expect('a').to     eql('a') # value equality" do end
+      it "·                  ^^^" do
           expect('a').to     eql('a')
       end
       it "expect( 1 ).not_to eql(1.0) # 1 and 1.0 are not 'value equal'" do
           expect( 1 ).not_to eql(1.0)
       end
     end
-    describe 'IDENTITY equality with #equal (uses #equal?)' do
+    describe 'IDENTITY equality with #equal or #be [uses #equal?]' do
       it "a = b = 'x'" do
           expect(true).to be(true)
       end
-      it "expect( a ).to     equal( b ) # same object" do
+      it "expect( a ).to     equal( b ) # same object" do end
+      it "·                  ^^^^^" do
           a = b = 'x'
           expect( a ).to     equal( b )
       end
-      it "expect( a ).to        be( b ) # 'be()' is a synonym for 'equal()'" do
+      it "expect( a ).to        be( b ) # 'be()' is a synonym for 'equal()'" do end
+      it "·                     ^^                    ^^^^^^^" do
           a = b = 'x'
           expect( a ).to        be( b )
       end
@@ -47,11 +60,16 @@
           expect('z').not_to equal('z')
       end
     end
-    describe "TRUTHINESS/boolean matchers" do
-      it "expect(1 < 2).to     be(true)   # DO NOT use 'be_true'  (old usage and confusingly meant truthy!)" do
+    describe "BOOLEAN matchers" do
+      it "expect(1 < 2).to     be(true)   # okay)" do end
+      it "·                    ^^^^^^^" do end
+      it "·                               # but DO NOT use 'be_true'  (old and means truthy!)" do end
+      it "·                                 ^^^^^^^^^^^^^^^^^^^^^^^            ^^^^^^^^^^^^!" do
           expect(1 < 2).to     be(true)
       end
-      it "expect(1 > 2).to     be(false)  # DO NOT use 'be_false' (old usage and confusingly meant falsey!)" do
+      it "expect(1 > 2).to     be(false)  # okay)" do end
+      it "·                               # but DO NOT use 'be_false' (old and means truthy!)" do end
+      it "·                                 ^^^^^^^^^^^^^^^^^^^^^^^^^          ^^^^^^^^^^^^!" do
           expect(1 > 2).to     be(false)
       end
       it "expect('foo').not_to be(true)   # a string is not 'true'  (but is 'truthy')" do
@@ -63,6 +81,8 @@
       it "expect(  0  ).not_to be(false)  #        0 is not 'false' (nor    'falsey')" do
           expect(  0  ).not_to be(false)
       end
+    end
+    describe "TRUTHINESS/boolean matchers" do
       it "expect( true).to     be_truthy  #       true is 'truthy'" do
           expect( true).to     be_truthy
       end
@@ -79,53 +99,65 @@
           expect(  0  ).not_to be_falsey
       end
     end
-    describe "NIL-ness matcherers (uses #nil?)" do
-      it "expect( nil ).to be_nil   # be_nil  is fine" do
+    describe "NIL-ness matcherers [uses #nil?]" do
+      it "expect( nil ).to be_nil   # be_nil  is fine" do end
+      it "·                ^^^^^^" do
           expect( nil ).to be_nil
       end
-      it "expect( nil ).to be(nil)  # be(nil) is also fine" do
+      it "expect( nil ).to be(nil)  # be(nil) is also fine" do end
+      it "·                ^^^^^^       ^   ^" do
           expect( nil ).to be(nil)
       end
     end
     describe 'NUMERIC COMPARISON matchers' do
-      it "expect(10).to be >   9 #  also: >=, <, <=" do
+      it "expect(10).to be >   9 #  also: >=, <, <=" do end
+      it "·                ^              ^^  ^  ^^" do
           expect(10).to be >   9
       end
     end
     describe 'NUMERIC RANGE matchers' do
-      it "expect(   10).to     be_between(5, 10).inclusive" do
+      it "expect(   10).to     be_between(5, 10).inclusive" do end
+      it "·                    ^^^^^^^^^^        ^^^^^^^^^" do
           expect(   10).to     be_between(5, 10).inclusive
       end
-      it "expect(   10).not_to be_between(5, 10).exclusive" do
+      it "expect(   10).not_to be_between(5, 10).exclusive" do end
+      it "·                    ^^^^^^^^^^        ^^^^^^^^^" do
           expect(   10).not_to be_between(5, 10).exclusive
       end
-      it "expect(   10).to     be_within(1).of(11)        " do
+      it "expect(   10).to     be_within(1).of(11)        " do end
+      it "·                    ^^^^^^^^^^   ^^" do
           expect(   10).to     be_within(1).of(11)
       end
-      it "expect(5..10).to     cover(9)                   # sortof an inversion of between/within" do
+      it "expect(5..10).to     cover(9)                   # sortof an inversion of between/within" do end
+      it "·                    ^^^^^" do
           expect(5..10).to     cover(9)
       end
     end
     describe 'COLLECTION matchers' do
-      it "expect( [1,2,3] ).to     include(3)           " do
+      it "expect( [1,2,3] ).to     include(3)           " do end
+      it "·                        ^^^^^^^" do
           expect( [1,2,3] ).to     include(3)
       end
       it "expect( [1,2,3] ).to     include(1,3)         " do
           expect( [1,2,3] ).to     include(1,3)
       end
-      it "expect( [1,2,3] ).to     start_with(1)        " do
+      it "expect( [1,2,3] ).to     start_with(1)        " do end
+      it "·                        ^^^^^ ^^^^" do
           expect( [1,2,3] ).to     start_with(1)
       end
-      it "expect( [1,2,3] ).to     end_with(3)          " do
+      it "expect( [1,2,3] ).to     end_with(3)          " do end
+      it "·                        ^^^ ^^^^" do
           expect( [1,2,3] ).to     end_with(3)
       end
-      it "expect( [1,2,3] ).to     match_array([3,2,1])   # must have all items, but order not important" do
+      it "expect( [1,2,3] ).to     match_array([3,2,1])   # must have all items, but order not important" do end
+      it "·                        ^^^^^^^^^^" do
           expect( [1,2,3] ).to     match_array([3,2,1])
       end
       it "expect( [1,2,3] ).not_to match_array([1,2])     # must have all items, but order not important" do
           expect( [1,2,3] ).not_to match_array([1,2])
       end
-      it "expect( [1,2,3] ).to     contain_exactly(3,2,1) # similar to match_array(); uses individual args" do
+      it "expect( [1,2,3] ).to     contain_exactly(3,2,1) # similar to match_array(); uses individual args" do end
+      it "·                        ^^^^^^^^^^^^^^^" do
           expect( [1,2,3] ).to     contain_exactly(3,2,1)
       end
       it "expect( [1,2,3] ).not_to contain_exactly(1,2)   # similar to match_array(); uses individual args" do
@@ -133,25 +165,29 @@
       end
     end
     describe "STRING matchers" do
-      it "expect('some string').to    include('ring')" do
+      it "expect('some string').to    include('ring')" do end
+      it "·                           ^^^^^^^" do
           expect('some string').to    include('ring')
       end
-      it "expect('some string').to    include('so', 'ring')" do
+      it "expect('some string').to    include('so', 'ring') # include both the sub-strings" do
           expect('some string').to    include('so', 'ring')
       end
-      it "expect('some string').to start_with('so')" do
+      it "expect('some string').to start_with('so')" do end
+      it "·                        ^^^^^^^^^^" do
           expect('some string').to start_with('so')
       end
-      it "expect('some string').to   end_with('ring')" do
+      it "expect('some string').to   end_with('ring')" do end
+      it "·                          ^^^^^^^^" do
           expect('some string').to   end_with('ring')
       end
     end
     describe "HASH matchers" do
+      it "expect( {:a => 1, :b => 2, :c => 3} ).to     include(  :a  )" do end
+      it "·                                            ^^^^^^^" do
+          expect( {:a => 1, :b => 2, :c => 3} ).to     include(  :a  )
+      end
       it "expect( {:a => 1, :b => 2, :c => 3} ).not_to include(  'a' )" do
           expect( {:a => 1, :b => 2, :c => 3} ).not_to include(  'a' )
-      end
-      it "expect( {:a => 1, :b => 2, :c => 3} ).to     include(  :a  )" do
-          expect( {:a => 1, :b => 2, :c => 3} ).to     include(  :a  )
       end
       it "expect( {:a => 1, :b => 2, :c => 3} ).to     include(  :a => 1  )" do
           expect( {:a => 1, :b => 2, :c => 3} ).to     include(  :a => 1  )
@@ -164,32 +200,40 @@
       end
     end
     describe 'REGEX matchers' do
-      it "expect( '53 orders taken' ).to match( /\d{2}(.+)order(.+)taken/ )" do
+      it "expect( '53 orders taken' ).to match( /\d{2}(.+)order(.+)taken/ )" do end
+      it "·                              ^^^^^  ^                       ^" do
           expect( '53 orders taken' ).to match( /\d{2}(.+)order(.+)taken/ )
       end
     end
     describe 'OBJECT matchers' do
-      it "expect('hi').to  be_instance_of(String)    # exact object type matcher " do
+      it "expect('hi').to  be_instance_of(String)    # exact object type matcher " do end
+      it "·                ^^^^^^^^^^^^^^              ^^^^^^^^^^^^" do
           expect('hi').to  be_instance_of(String)
       end
-      it "expect('hi').to  be_an_instance_of(String) #   alias" do
+      it "expect('hi').to  be_an_instance_of(String) #   alias" do end
+      it "·                ^^^^^^^^^^^^^^^^^" do
           expect('hi').to  be_an_instance_of(String)
       end
-      it "expect('hi').to  be_a(String)              # is-a object type matcher" do
+      it "expect('hi').to  be_a(String)              # #is_a?" do end
+      it "·                ^^^^                         ^^^^^" do
           expect('hi').to  be_a(String)
       end
-      it "expect('hi').to  be_a_kind_of(String)      #   alias" do
+      it "expect('hi').to  be_a_kind_of(String)      #   alias" do end
+      it "·                ^^^^^^^^^^^^" do
           expect('hi').to  be_a_kind_of(String)
       end
-      it "expect('hi').to  be_kind_of(String)        #   alias" do
+      it "expect('hi').to  be_kind_of(String)        #   alias" do end
+      it "·                ^^^^^^^^^^" do
           expect('hi').to  be_kind_of(String)
       end
-      it "expect([1,2]).to be_an(Array)              #   alias" do
+      it "expect([1,2]).to be_an(Array)              #   alias" do end
+      it "·                ^^^^^" do
           expect([1,2]).to be_an(Array)
       end
     end
     describe "RESPOND_TO message matchers" do
-      it "expect('hi').to     respond_to(:length)" do
+      it "expect('hi').to     respond_to(:length)" do end
+      it "·                   ^^^^^^^^^^" do
           expect('hi').to     respond_to(:length)
       end
       it "expect('hi').not_to respond_to(:sort)  " do
@@ -197,7 +241,8 @@
       end
     end
     describe "HAVE_ATTRIBUTES matcher will match if class has 'attr_accessor'" do
-      it "expect(car).to have_attributes(:make => 'Dodge', :year => 2010, :color => 'green')" do
+      it "expect(car).to have_attributes(:make => 'Dodge', :year => 2010, :color => 'green')" do end
+      it "·              ^^^^^^^^^^^^^^^" do
         class Car
           attr_accessor :make, :year, :color
         end
@@ -209,7 +254,8 @@
     end
     describe "SATISFY matcher will match pretty much anything" do
       it "expect(10).to satisfy do |value|" do end
-      it "__(value >= 5) && (value % 2 == 0)" do end
+      it "·             ^^^^^^^" do end
+      it "··(value >= 5) && (value % 2 == 0)" do end
       it "end" do
         expect(10).to satisfy do |value|
           (value >= 5) && (value % 2 == 0)
@@ -218,56 +264,71 @@
     end
     describe "PREDICATE matchers (return true/false)" do
       describe "these 'be_*' matchers map to #*? ( drops 'be_', adds '?' ) - take no args" do
-        it "expect( []).to be_empty                     # built-in method [].empty?" do
+        it "expect( []).to be_empty                     # built-in method [].empty?" do end
+        it "·              ^^^^^^^^                                         ^^^^^^^" do
             expect( []).to be_empty
         end
-        it  "expect( 1 ).to be_integer                   # built-in method 1.integer?" do
-             expect( 1 ).to be_integer
+        it "expect( 1 ).to be_integer                   # built-in method 1.integer?" do end
+        it "·              ^^^^^^^^^^                                       ^^^^^^^" do
+            expect( 1 ).to be_integer
         end
-        it  "expect( 0 ).to be_zero                      # built-in method 0.zero?" do
-             expect( 0 ).to be_zero
+        it "expect( 0 ).to be_zero                      # built-in method 0.zero?" do end
+        it "·              ^^^^^^^                                          ^^^^^" do
+            expect( 0 ).to be_zero
         end
-        it  "expect( 1 ).to be_nonzero                   # built-in method 1.nonzero?" do
-             expect( 1 ).to be_nonzero
+        it "expect( 1 ).to be_nonzero                   # built-in method 1.nonzero?" do end
+        it "·              ^^^^^^^^^^                                       ^^^^^^^^" do
+            expect( 1 ).to be_nonzero
         end
-        it  "expect( 1 ).to be_odd                       # built-in method 1.odd?" do
-             expect( 1 ).to be_odd
+        it "expect( 1 ).to be_odd                       # built-in method 1.odd?" do end
+        it "·              ^^^^^^                                          ^^^^^" do
+            expect( 1 ).to be_odd
         end
-        it  "expect( 2 ).to be_even                      # built-in method 1.even?" do
-             expect( 2 ).to be_even
+        it "expect( 2 ).to be_even                      # built-in method 1.even?" do end
+        it "·              ^^^^^^^                                          ^^^^^" do
+            expect( 2 ).to be_even
         end
-        it  "expect(nil).to be_nil                       # built-in method nil.nil?" do
-             expect(nil).to be_nil
+        it "expect(nil).to be_nil                       # built-in method nil.nil?" do end
+        it "·              ^^^^^^                                             ^^^^" do
+            expect(nil).to be_nil
         end
-        it  "expect(this_object).to          be_visible  #   custom method: this_object.visible?" do
-             expect(this_object).to          be_visible
+        it "expect(this_object).to          be_visible  #   custom method: this_object.visible?" do end
+        it "·                               ^^^^^^^^^^                                 ^^^^^^^^" do
+            expect(this_object).to         be_visible
         end
-        it  "expect(this_object.visible?).to be true     #                  exactly the same" do
-             expect(this_object.visible?).to be true
+        it "expect(this_object.visible?).to be true     #                  exactly the same" do end
+        it "·                  ^^^^^^^^     ^^ ^^^^                        ^^^^^^^^^^^^^^^^" do
+            expect(this_object.visible?).to be true
         end
       end
       describe "these 'have_*' matchers map to '#has_*?' - args optional" do
-        it "expect( {:a => 1, :b => 2} ).to have_key(:a)  # Hash#has_key?" do
+        it "expect( {:a => 1, :b => 2} ).to have_key(:a)  # Hash#has_key?" do end
+        it "·                               ^^^^^^^^             ^^^^^^^^" do
             expect( {:a => 1, :b => 2} ).to have_key(:a)
         end
-        it "expect( {:a => 1, :b => 2} ).to have_value(2) # Hash#has_value?" do
+        it "expect( {:a => 1, :b => 2} ).to have_value(2) # Hash#has_value?" do end
+        it "·                               ^^^^^^^^^^           ^^^^^^^^^^" do
             expect( {:a => 1, :b => 2} ).to have_value(2)
         end
-        it "expect(customer).to have_order         # predicate matcher # custom method: customer.has_order?" do
+        it "expect(customer).to have_order         # predicate matcher # custom method: customer.has_order?" do end
+        it "·                   ^^^^^^^^^^                                                       ^^^^^^^^^^" do
             expect(customer).to have_order
         end
-        it "expect(customer.has_order?).to be true # predicate matcher #                 exactly the same" do
+        it "expect(customer.has_order?).to be true # predicate matcher #                 exactly the same" do end
+        it "·               ^^^^^^^^^^     ^^ ^^^^                                       ^^^^^^^^^^^^^^^^" do
             expect(customer.has_order?).to be true
         end
       end
     end
     describe "OBSERVATIONAL matchers - take a block (  'expect {}', instead of 'expect()' )" do
       it "=> they match when events change object attributes (calls test before block, then after block)" do end
-      it "expect {     array << 1 }.to change(array, :empty?).from(true).to(false) # calls array.empty?()" do
+      it "expect {     array << 1 }.to change(array, :empty?).from(true).to(false) # calls array.empty?()" do end
+      it "·                            ^^^^^^                 ^^^^       ^^" do
           array = []
           expect {     array << 1 }.to change(array, :empty?).from(true).to(false)
       end
-      it "expect { hits.increment }.to change(hits,  :count) .from(0)   .to(1)     # calls hits.count()" do
+      it "expect { hits.increment }.to change(hits,  :count) .from(0)   .to(1)     # calls hits.count()" do end
+      it "·                            ^^^^^^                 ^^^^       ^^" do
           expect { hits.increment }.to change(hits,  :count) .from(0)   .to(1)
       end
     end
@@ -277,103 +338,121 @@
       it "=> must have a value before the block" do end
       it "=> must change the value inside the block" do end
       it "x = 10" do end
-      it "expect { x += 1 }.to change {x}.from(10).to(11)" do
-          expect { x += 1 }.to change {x}.from(10).to(11)
+      it "expect { x += 1 }.to change {   x   }.from(10).to(11)" do end
+      it "·                    ^^^^^^           ^^^^     ^^" do
+          expect { x += 1 }.to change {   x   }.from(10).to(11)
       end
-      it "expect { x += 1 }.to change {x}.by(1)" do
-          expect { x += 1 }.to change {x}.by(1)
+      it "expect { x += 1 }.to change {   x   }.by(1)" do end
+      it "·                    ^^^^^^           ^^" do
+          expect { x += 1 }.to change {   x   }.by(1)
       end
-      it "expect { x += 1 }.to change {x}.by_at_least(1)" do
-          expect { x += 1 }.to change {x}.by_at_least(1)
+      it "expect { x += 1 }.to change {   x   }.by_at_least(1)" do end
+      it "·                    ^^^^^^           ^^^^^^^^^^^" do
+          expect { x += 1 }.to change {   x   }.by_at_least(1)
       end
-      it "expect { x += 1 }.to change {x}.by_at_most(1)" do
-          expect { x += 1 }.to change {x}.by_at_most(1)
+      it "expect { x += 1 }.to change {   x   }.by_at_most(1)" do end
+      it "·                    ^^^^^^           ^^^^^^^^^^" do
+          expect { x += 1 }.to change {   x   }.by_at_most(1)
       end
-      it "expect { x += 1 }.to change { x % 2 }.from(0).to(1)" do
+      it "expect { x += 1 }.to change { x % 2 }.from(0).to(1)" do end
+      it "·                    ^^^^^^           ^^^^    ^^" do
           expect { x += 1 }.to change { x % 2 }.from(0).to(1)
       end
     end
     describe "OBSERVATIONAL matchers - for exceptions" do
-      RSpec::Expectations.configuration.warn_about_potential_false_positives = false
+#         RSpec::Expectations.configuration.warn_about_potential_false_positives = false
       it "RSpec::Expectations.configuration.warn_about_potential_false_positives = false" do end
-      it "expect { raise StandardError }.to raise_error                              # match on exception" do
+      it "expect { 1 / 1 }.not_to           raise_error" do end
+      it "expect { 1 / 1 }.to_not           raise_error" do end
+      it "^^^^^^           ^^^^^^           ^^^^^^^^^^^" do
+          expect { 1 / 1 }.not_to           raise_error
+      end
+      it "expect { raise StandardError }.to raise_error                              # match on exception" do end
+      it "^^^^^^                            ^^^^^^^^^^^" do
           expect { raise StandardError }.to raise_error
       end
-      it "expect { raise StandardError }.to raise_exception                          # match on exception" do
+      it "expect { raise StandardError }.to raise_exception                          # match on exception" do end
+      it "^^^^^^                            ^^^^^^^^^^^^^^^" do
           expect { raise StandardError }.to raise_exception
       end
-      it "expect { 1 / 0 }.to               raise_error(ZeroDivisionError)           # match on type of exception" do
+      it "expect { 1 / 0 }.to               raise_error(ZeroDivisionError)           # match on type of exception" do end
+      it "^^^^^^                            ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^" do
           expect { 1 / 0 }.to               raise_error(ZeroDivisionError)
       end
-      it "expect { 1 / 0 }.to               raise_error.with_message('divided by 0') # match on exception message" do
+      it "expect { 1 / 0 }.to               raise_error.with_message('divided by 0') # match on exception message" do end
+      it "^^^^^^                            ^^^^^^^^^^^ ^^^^^^^^^^^^^" do
           expect { 1 / 0 }.to               raise_error.with_message('divided by 0')
       end
-      it "expect { 1 / 0 }.to               raise_error.with_message(/divided/)      # match on exception msg regex" do
+      it "expect { 1 / 0 }.to               raise_error.with_message(/divided/)      # match on exception msg regex" do end
+      it "^^^^^^                            ^^^^^^^^^^^ ^^^^^^^^^^^^" do
           expect { 1 / 0 }.to               raise_error.with_message(/divided/)
-      end
-      it "expect { 1 / 1 }.not_to           raise_error" do
-          expect { 1 / 1 }.not_to           raise_error
       end
     end
     describe "OBSERVATIONAL matchers - output to stdout / stderr " do
-      it "expect { print('howdy') }.to output.to_stdout          # stdout written" do
+      it "expect { print('howdy') }.to output.to_stdout          # stdout written" do end
+      it "^^^^^^                       ^^^^^^^^^^^^^^^^" do
           expect { print('howdy') }.to output.to_stdout
       end
-      it "expect { print('howdy') }.to output('howdy').to_stdout # stdout written" do
+      it "expect { print('howdy') }.to output('howdy').to_stdout # stdout written msg" do end
+      it "^^^^^^                       ^^^^^^          ^^^^^^^^^" do
           expect { print('howdy') }.to output('howdy').to_stdout
       end
-      it "expect { print('howdy') }.to output(/wd/).to_stdout    # stdout written" do
+      it "expect { print('howdy') }.to output(/wd/).to_stdout    # stdout written regex" do end
+      it "^^^^^^                       ^^^^^^       ^^^^^^^^^" do
           expect { print('howdy') }.to output(/wd/).to_stdout
       end
-      it "expect {  warn('issue') }.to output(/issue/).to_stderr # stderr written" do
+      it "expect {  warn('issue') }.to output(/issue/).to_stderr # stdERR written" do end
+      it "^^^^^^                       ^^^^^^          ^^^^^^^^^" do
           expect {  warn('issue') }.to output(/issue/).to_stderr
       end
     end
     describe "COMPOUND expectations (and, or, &, |)" do
           array=[1,2,3,4]
       it "array=[1,2,3,4]                               " do end
-      it "expect(array).to start_with(1).and end_with(4)" do
+      it "expect(array).to start_with(1).and end_with(4)" do end
+      it "·                              ^^^" do
           expect(array).to start_with(1).and end_with(4)
       end
-      it ".                              ^^^            " do end
-      it "expect(array).to start_with(1)  &  include(2)   " do
+      it "expect(array).to start_with(1)  &  include(2)" do end
+      it "·                              ^^^" do
           expect(array).to start_with(1)  &  include(2)
       end
-      it ".                              ^^^             " do end
-      it "expect(2).to eq(1) |  eq(2) " do
-          expect(2).to eq(1) |  eq(2)
-      end
-      it ".                 ^^^ " do end
-      it "expect(2).to eq(1).or eq(2) " do
+      it "expect(2).to eq(1).or eq(2) " do end
+      it "·                 ^^^ " do
           expect(2).to eq(1).or eq(2)
       end
-      it ".                  ^^ " do end
+      it "expect(2).to eq(1) |  eq(2) " do end
+      it "·                 ^^^" do
+          expect(2).to eq(1) |  eq(2)
+      end
     end
     describe "COMPOSING matchers, that accept matchers as args (rspec3)" do
       describe "all" do
         it "array = [1,2,3]" do end
-        it "expect(array).to all( be < 5 ) # each element must meet the expectation" do
+        it "expect(array).to all( be < 5 ) # each element must meet the expectation" do end
+        it "·                ^^^  ‾‾" do
           array = [1,2,3]
           expect(array).to all( be < 5 ) # each element must meet the expectation
         end
       end
       describe "from to" do
-        it "string = 'hello'" do end
-        it "expect { string = 'goodbye' }.to change { string }." do end
-        it "__from( match(/ll/) ).to( match(/oo/) )" do
+        it "s = '01'" do end
+        it "expect { s = '20' }.to change { string }.from( match(/1/) ).to( match(/2/) )" do end
+        it "·                      ^^^^^^            ^^^^  ‾‾‾‾‾        ^^  ‾‾‾‾‾" do
           # will match by sending matchers as arguments to matchers"
-          string = "hello"
-          expect { string = "goodbye" }.to change { string }.
-            from( match(/ll/) ).to( match(/oo/) )
+          s = "01"
+          expect { s = "20" }.to change { s }.from( match(/1/) ).to( match(/2/) )
         end
       end
       describe "include" do
         it "hash = {:a => 1, :b => 2, :c => 3}" do end
         hash = {:a => 1, :b => 2, :c => 3}
-        it "expect(hash).to include(:a => be_odd, :b => be_even, :c => be_odd)" do
+        it "expect(hash).to include(:a => be_odd, :b => be_even, :c => be_odd)" do end
+        it "·               ^^^^^^^       ‾‾‾‾‾‾        ‾‾‾‾‾‾‾        ‾‾‾‾‾‾‾" do
             expect(hash).to include(:a => be_odd, :b => be_even, :c => be_odd)
         end
-        it "expect(hash).to include(:a => be > 0, :b => be_within(2).of(4))" do
+        it "expect(hash).to include(:a => be > 0, :b => be_within(2).of(4))" do end
+        it "·               ^^^^^^^       ‾‾‾‾‾‾        ‾‾‾‾‾‾‾‾‾    ‾‾" do
             expect(hash).to include(:a => be > 0, :b => be_within(2).of(4))
         end
       end
@@ -388,8 +467,8 @@
         describe "example" do
           it "fruits = ['apple', 'banana', 'cherry']" do end
           it "expect(fruits).to start_with( a_string_starting_with('a') ) & " do end
-          it "__include( a_string_matching(/a.a.a/) ) & " do end
-          it "__end_with( a_string_ending_with('y') )" do
+          it "··include( a_string_matching(/a.a.a/) ) & " do end
+          it "··end_with( a_string_ending_with('y') )" do
               fruits = ['apple', 'banana', 'cherry']
               expect(fruits).to start_with( a_string_starting_with('a') ) &
                 include( a_string_matching(/a.a.a/) ) &
@@ -399,3 +478,171 @@
       end
     end
   end
+  describe "Chapter 6" do
+    describe "DOUBLES - full doubles" do
+      describe "stub method to respond to a message" do
+        it "dbl = double('Chant')" do end
+        it "allow(dbl).to receive(:hey!)     # the double will allow #hey! to be called" do end
+        it "·             ^^^^^^^^" do end
+        it "expect(dbl).to respond_to(:hey!) # prove that #hey! is now a callable method" do end
+        it "·              ^^^^^^^^^^" do
+            dbl = double("Chant")
+            allow(dbl).to receive(:hey!)     # the double will allow #hey! to be called
+            expect(dbl).to respond_to(:hey!) # prove that #hey! is now a callable method
+        end
+      end
+      describe "stub a response to a method call; also insist it be called" do
+        it "dbl = double('Chant')" do end
+        it "allow(dbl).to receive(:hey!) { 'Ho!' }         # alternative A" do end
+        it "·                            ^^     ^^" do end
+        it "allow(dbl).to receive(:hey!).and_return('Ho!') # alternative B" do end
+        it "·                            ^^^^^^^^^^" do end
+        it "expect(dbl.hey!).to eq('Ho!')                  # prove it returns 'Ho! " do end
+        it "expect(dbl).to receive(:hey!).and_return('Ho!')" do end
+        it "^^^^^^                        ^^^^^^^^^^       # unlike #allow, we now #expect it to be called" do end
+        it "dbl.hey!" do end
+        it "·   ^^^^                                       # we call it" do
+            dbl = double("Chant")
+            allow(dbl).to receive(:hey!) { "Ho!" }         # alternative A ( block  )
+            allow(dbl).to receive(:hey!).and_return('Ho!') # alternative B ( method )
+            expect(dbl.hey!).to eq("Ho!")                  # prove it returns 'Ho! " do
+            expect(dbl).to receive(:hey!).and_return('Ho!')
+            dbl.hey!
+        end
+      end
+      describe "stub #ordered method calls" do
+        it "dbl = double('Multi-step Process')" do end
+        it "expect(dbl).to receive(:step_1).ordered" do end
+        it "·                               ^^^^^^^" do end
+        it "expect(dbl).to receive(:step_2).ordered" do end
+        it "·                               ^^^^^^^" do end
+        it "dbl.step_1" do end
+        it "dbl.step_2" do
+            dbl = double('Multi-step Process')
+            expect(dbl).to receive(:step_1).ordered
+            expect(dbl).to receive(:step_2).ordered
+            dbl.step_1
+            dbl.step_2
+        end
+      end
+      describe "stub multiple methods with hash syntax" do
+        it "dbl = double('Person')" do end
+        # Note this uses #receive_messages, not #receive
+        it "allow(dbl).to receive_messages(:full_name => 'Mary Smith', :initials => 'MTS')" do end
+        it "·             ^^^^^^^^^^^^^^^^" do end
+        it "expect(dbl.full_name).to eq('Mary Smith')" do end
+        it "expect(dbl.initials).to eq('MTS')" do
+            dbl = double('Person')
+            # Note this uses #receive_messages, not #receive
+            allow(dbl).to receive_messages(:full_name => 'Mary Smith', :initials => 'MTS')
+            expect(dbl.full_name).to eq('Mary Smith')
+            expect(dbl.initials).to eq('MTS')
+        end
+      end
+      describe "stub with a hash argument to #double" do
+        it "dbl = double('Person', :full_name => 'Mary Smith', :initials => 'MTS')" do end
+        it "·     ^^^^^^           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" do end
+        it "expect(dbl.full_name).to eq('Mary Smith')" do end
+        it "expect(dbl.initials).to eq('MTS')" do
+            dbl = double('Person', :full_name => 'Mary Smith', :initials => 'MTS')
+            expect(dbl.full_name).to eq('Mary Smith')
+            expect(dbl.initials).to eq('MTS')
+        end
+      end
+      describe "allows stubbing MULTIPLE RESPONSES with #and_return" do
+        it "die = double('Die')" do end
+        it "allow(die).to receive(:roll).and_return(1,6)" do end
+        it "·                                       ^^^" do end
+        it "expect(die.roll).to eq(1)" do end
+        it "·                      ^" do end
+        it "expect(die.roll).to eq(6)" do end
+        it "·                      ^" do end
+        it "expect(die.roll).to eq(6) # continues returning last value" do end
+        it "·                      ^" do
+          die = double('Die')
+          allow(die).to receive(:roll).and_return(1,6)
+          expect(die.roll).to eq(1)
+          expect(die.roll).to eq(6)
+          expect(die.roll).to eq(6)  # continues returning last value
+        end
+      end
+    end
+    describe "DOUBLES - partial doubles" do
+      describe "stub INSTANCE methods on classes" do
+        it "time = Time.new(2010, 1, 1, 12, 0, 0)" do end
+        it "^^^^" do end
+        it "allow(time).to receive(:year).and_return(1975)" do end
+        it "·     ^^^^     ^^^^^^^        ^^^^^^^^^^" do end
+        it "expect(time.to_s).to eq('2010-01-01 12:00:00 -0800')" do end
+        it "expect(time.year).to eq(1975)" do
+            time = Time.new(2010, 1, 1, 12, 0, 0)
+            allow(time).to receive(:year).and_return(1975)
+            expect(time.to_s).to eq('2010-01-01 12:00:00 -0800')
+            expect(time.year).to eq(1975)
+        end
+      end
+      describe "stub CLASS methods on classes" do
+        it "fixed = Time.new(2010, 1, 1, 12, 0, 0)" do end
+        it "^^^^^" do end
+        it "allow(Time).to receive(:now).and_return(fixed)" do end
+        it "·     ^^^^     ^^^^^^^ ^^^^  ^^^^^^^^^^ ^^^^^" do end
+        it "expect(Time.now).to eq(fixed)" do end
+        it "·      ^^^^^^^^        ^^^^^" do end
+        it "expect(Time.now.to_s).to eq('2010-01-01 12:00:00 -0800')" do end
+        it "·      ^^^^^^^^^^^^^         ^^^^ ^^ ^^ ^^" do end
+        it "expect(Time.now.year).to eq(2010)" do end
+        it "·      ^^^^^^^^^^^^^        ^^^^" do
+            fixed = Time.new(2010, 1, 1, 12, 0, 0)
+            allow(Time).to receive(:now).and_return(fixed)
+            expect(Time.now).to eq(fixed)
+            expect(Time.now.to_s).to eq('2010-01-01 12:00:00 -0800')
+            expect(Time.now.year).to eq(2010)
+        end
+      end
+      describe "stub database calls with mock objects" do
+        it "class Customer" do end
+        it "· attr_accessor :name" do end
+        it "· def self.find ... end" do end
+        it "· def self.all ... end" do end
+        it "end" do end
+        it "c1 = double('First Customer')" do end
+        it "^^" do end
+        it "c2 = double('Second Customer', :name => 'Mary')" do end
+        it "^^" do end
+        it "allow(c1).to receive(:name).and_return('Bob')" do end
+        it "·     ^^" do end
+        it "allow(Customer).to receive(:all).and_return([c1,c2])" do end
+        it "·     ^^^^^^^^             ^^^^             ^^^^^^^" do end
+        it "allow(Customer).to receive(:find).and_return(c1)" do end
+        it "·     ^^^^^^^^             ^^^^^             ^^" do end
+        it "expect(customer.find.name).to eq('Bob')" do end
+        it "·      ^^^^^^^^ ^^^^              ^^^" do end
+        it "expect(Customer.all[0].name).to eq('Bob')" do end
+        it "·      ^^^^^^^^ ^^^                 ^^^" do end
+        it "expect(Customer.all[1].name).to eq('Mary')" do end
+        it "·      ^^^^^^^^ ^^^                 ^^^^" do
+            class Customer
+              attr_accessor :name
+              def self.find
+                # database lookup, returns one object
+              end
+              def self.all
+                # database lookup, returns array of objects
+              end
+            end
+          c1 = double('First Customer')
+          c2 = double('Second Customer', :name => 'Mary')
+          allow(c1).to receive(:name).and_return('Bob')
+          allow(Customer).to receive(:all).and_return([c1,c2])
+          allow(Customer).to receive(:find).and_return(c1)
+          expect(Customer.find.name).to eq('Bob')
+          expect(Customer.all[0].name).to eq('Bob')
+        end
+      end
+    end
+  end
+
+=begin
+
+end
+=end
