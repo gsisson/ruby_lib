@@ -11,6 +11,7 @@
   end
   hits = customer = this_object = O.new
 
+  describe "Chapter 4" do
   describe "LOOSE equality with #eq (uses #==)" do
     it "expect('a').to eq('a')" do
         expect('a').to eq('a')
@@ -396,4 +397,5 @@
         end
       end
     end
+  end
   end
