@@ -4,7 +4,10 @@ if RUBY_PLATFORM !~ /cygwin/
 end
 
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start do
+  add_filter '../spec'
+  add_group 'lib', '../lib'
+end
 
 require 'rspec'
 
