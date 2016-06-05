@@ -247,7 +247,7 @@ class Net
             end
           end
         rescue Timeout::Error
-          puts # to get on a new line 
+          puts # to get on a new line
           puts "#     "+"WARNING: No connection!  Check the network cable. (or give it more time)".YELLOW
         end
         puts network_violation_msg() if network_violation?
@@ -294,9 +294,9 @@ class Net
             end
           end
         rescue Timeout::Error
-          puts
-          puts "WARNING: No network has yet been joined..."
-          puts "         You may need to manually select a wi-fi network. (or wait a little longer)"
+          puts # to get on a new line
+          puts "#     "+"WARNING: No network has yet been joined!".YELLOW
+          puts "#     "+"         You may need to manually select a wi-fi network. (or wait longer)"
         end
         puts network_violation_msg() if network_violation?
       else
