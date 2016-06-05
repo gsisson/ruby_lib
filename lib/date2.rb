@@ -1,3 +1,5 @@
+require 'date'
+
 # Date2 contains static methods for manipulating filenames passed to the methods as strings.
 # The class is used to generate and manipulate prefixes of filenames that represent dates and/or
 # date-times.  Methods exist to extract the prefixes, check them for validity, and convert them
