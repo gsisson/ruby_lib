@@ -3,6 +3,7 @@ require 'timeout'
 require_relative 'string_colorize.rb'
 
 class Net
+
   PROXY_RE = /^15./
   @wifi_info     = nil
   @ether_info    = nil
@@ -11,102 +12,9 @@ class Net
   @verbose       = false
   PROXY_VARS=%w{http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY}
 
-  def refresh_network_info()
-    @wifi_info     = nil
-    @ether_info    = nil
-    @network_order = nil
-    @networks      = nil
-  end
-
-  def verbose(flag)
-    @verbose = flag
-  end
-
-  def verbose?
-    @verbose
-  end
-
-  def proxy_query()
-    if PROXY_VARS.any? { |var| ENV[var] }
-      return "# proxy env vars ARE set"
-    else
-      return "# proxy env vars are NOT set"
-    end
-  end
-
-  def proxied_network?()
-    ether = get_ether_info()
-    wifi  = get_wifi_info()
-
-    proxied_ether = ether[:ip] && ! ether[:ip].match(PROXY_RE).nil?
-    proxied_wifi  =  wifi[:ip] && !  wifi[:ip].match(PROXY_RE).nil?
-
-    return proxied_ether if order[:first] == :wifi  && ! wifi[:enabled]
-    return proxied_ether if order[:first] == :ether &&   ether[:enabled]
-    return proxied_wifi  if order[:first] == :wifi  &&   wifi[:enabled]
-    return proxied_wifi  if order[:first] == :ether && ! ether[:enabled]
-  end
-
-  def proxy_set()
-    ether = get_ether_info()
-    wifi  = get_wifi_info()
-
-    proxy_vars_should_be_on = proxied_network?()
-    proxy_vars_are_on = PROXY_VARS.any? { |var| ENV[var] }
-
-    msg = []
-    proxy_msg = ""
-    if proxy_vars_should_be_on
-      proxy="web-proxy:8088"
-      proxy_file=ENV['HOME']+'/.proxy'
-      if File.exist?(proxy_file)
-        proxy=File.read(proxy_file).chomp
-        proxy_msg += "# (note: using proxy server/port found in ~/.proxy)"
-        proxy=proxy.sub(%r{https:/},'')
-        proxy=proxy.sub(%r{http:/},'')
-      else
-        proxy_msg += "# using default proxy server/port (override file ~/.proxy not found)"
-      end
-      PROXY_VARS.each do |var|
-        protocol = ( var =~ /https/i ) ? 'https' : 'http'
-        msg << "export #{var}=#{protocol}://#{proxy};" unless ENV[var]
-      end
-      unless msg.empty?
-        msg << "# proxy vars should be set!\n"
-        msg << "# set them with: \"eval $(#{THIS_FILE} proxy)\""
-        msg << proxy_msg
-      end
-    else
-      # build the command to unset any HTTP PROXY vars
-      proxy_vars=""
-      PROXY_VARS.each do |var|
-        proxy_vars += "#{var} " if ENV[var]
-      end
-      unless proxy_vars.empty?
-        msg <<  "unset #{proxy_vars};" 
-        msg << "# proxy vars should not be set"
-        msg << "# unset them with: \"eval $(#{THIS_FILE} proxy)\""
-      end
-    end
-    if msg.empty?
-      status = proxy_vars_should_be_on ? "(they are set)" : "(they are not set)"
-      return "#   proxy vars are set correctly #{status}"
-    end
-    return msg.join("\n")
-  end
-
-  def switch_to(network)
-    joining_network = network
-    leaving_network = ( network == :ether ) ? :wifi : :ether
-    result = turn_off(leaving_network)
-    puts result
-    return if result =~ /error/i
-    turn_on(joining_network)
-  end
-
   def toggle()
-    ether = get_ether_info()
-    wifi  = get_wifi_info()
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
 
     preferred_network = :ether
     if    ether[:enabled] && ether[:connected] \
@@ -128,13 +36,115 @@ class Net
     switch_to(new_network)
   end
 
-  def network_name_human(network)
-    case network
-    when :wifi
-      "wi-fi"
-    when :ether
-      "ethernet"
+  def details(network)
+    msg = []
+    info = get_info(network)
+    msg << "# "+"Current status of #{info[:name]} network:".YELLOW
+    info.keys.sort.each do |key|
+      the_key=key
+      if %w{enabled network connected}.include?(key.to_s)
+        if info[key]
+          the_key="#{key}".GREEN
+        else
+          the_key="#{key}".RED
+        end
+      end
+      msg << "#   #{the_key}: #{info[key]}"
     end
+    msg.join("\n")
+  end
+
+  def status(network = nil)
+    msg = []
+    if ! network
+      msg << "# Network status, in priority order:"
+      order[:order].each do |item|
+        msg << status(item)
+      end
+      msg << network_violation_msg() if network_violation?
+      return msg.join("\n") if msg
+    end
+    status    = ""
+    connected = nil
+    info      = get_info(network)
+    case network
+    when :ether
+      connected = info[:connected]
+    when :wifi
+      connected = info[:network]
+    end
+    status += "#   "
+    if info[:enabled] && connected
+      status += "#{info[:name]}".GREEN
+    else
+      status += "#{info[:name]}".RED
+    end
+    status += ": "
+    status += (info[:enabled] ? "enabled".GREEN : "disabled".RED)
+    case network
+    when :ether
+      status += (connected ? ", connected".GREEN : ", "+"disconnected".RED) if info[:enabled]
+    when :wifi
+      status += (connected ? ", network: #{info[:network].GREEN}" : '')
+    end
+    status += " (ip: #{info[:ip]})" if info[:enabled]
+    return status
+  end
+
+  def proxy_query()
+    if PROXY_VARS.any? { |var| ENV[var] }
+      return "# proxy env vars ARE set"
+    else
+      return "# proxy env vars are NOT set"
+    end
+  end
+
+  def proxy_set()
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
+
+    proxy_vars_should_be_on = network_requires_proxy?()
+    proxy_vars_are_on = PROXY_VARS.any? { |var| ENV[var] }
+
+    msg = []
+    proxy_msg = ""
+    if proxy_vars_should_be_on
+      proxy="web-proxy:8088"
+      proxy_file=ENV['HOME']+'/.proxy'
+      if File.exist?(proxy_file)
+        proxy=File.read(proxy_file).chomp
+        proxy_msg += "# (note: using proxy server/port found in ~/.proxy)"
+        proxy=proxy.sub(%r{https:/},'')
+        proxy=proxy.sub(%r{http:/},'')
+      else
+        proxy_msg += "# using default proxy server/port (override file ~/.proxy not found)"
+      end
+      PROXY_VARS.each do |var|
+        protocol = ( var =~ /https/i ) ? 'https' : 'http'
+        msg << "export #{var}=#{protocol}://#{proxy};" unless ENV[var]
+      end
+      unless msg.empty?
+        msg << "# proxy vars should be set!"
+        msg << "# set them with: \"eval $(#{THIS_FILE} proxy)\""
+        msg << proxy_msg
+      end
+    else
+      # build the command to unset any HTTP PROXY vars
+      proxy_vars=""
+      PROXY_VARS.each do |var|
+        proxy_vars += "#{var} " if ENV[var]
+      end
+      unless proxy_vars.empty?
+        msg << "# proxy vars should not be set"
+        msg << "# unset them with: \"eval $(#{THIS_FILE} proxy)\""
+        msg <<  "unset #{proxy_vars};"
+      end
+    end
+    if msg.empty?
+      status = proxy_vars_should_be_on ? "(they are set)" : "(they are not set)"
+      return "# proxy vars are set correctly #{status}"
+    end
+    return msg.join("\n")
   end
 
   def turn_off(network)
@@ -142,7 +152,7 @@ class Net
     msg << "#   Turning off #{network_name_human(network)}"
     case network
     when :ether
-      ether = get_ether_info()
+      ether = get_info(:ether)
       if ether[:enabled]
         cmd="networksetup -setnetworkserviceenabled '#{ether[:name]}' off"
         msg << "# + #{cmd}" if verbose?
@@ -155,7 +165,7 @@ class Net
         refresh_network_info()
       end
     when :wifi
-      wifi = get_wifi_info()
+      wifi = get_info(:wifi)
       if wifi[:enabled]
         cmd="networksetup -setairportpower '#{wifi[:device]}' off"
         msg << "# + #{cmd}" if verbose?
@@ -171,42 +181,27 @@ class Net
     return msg.join("\n")    
   end
 
-  def network_violation?()
-    network_violation_msg() != nil
-  end
-
-  def network_violation_msg()
-    ether = get_ether_info()
-    wifi  = get_wifi_info()
-
-    # check if we are on both a proxied network and a non-proxied network
-    msg = []
-    if ether[:enabled] && wifi[:enabled]
-      proxy_network_in_use = ether[:ip] =~ PROXY_RE || wifi[:ip] =~ PROXY_RE
-      other_network_in_use = ether[:ip] !~ PROXY_RE || wifi[:ip] !~ PROXY_RE
-      if proxy_network_in_use && other_network_in_use
-        proxy_network_in_use = ether[:ip] =~ PROXY_RE ? 'ethernet' : 'wi-fi'
-        other_network_in_use = ether[:ip] !~ PROXY_RE ? 'ethernet' : 'wi-fi'
-        msg << "WARNING: Proxied network is enabled (#{proxy_network_in_use}), but so is a non-proxied network (#{other_network_in_use})!".YELLOW
-        msg << "         This can be a security risk.".YELLOW
-        msg << "         You should turn off one of the networks.".YELLOW
-        return msg.join("\n")
-      end
-    end
-    nil
-  end
-
   def turn_on(network)
-    ether = get_ether_info()
-    wifi  = get_wifi_info()
-
-    if network_violation?
-      puts network_violation_msg()
-      return 
-    end
     puts "#   Turning on #{network_name_human(network)}"
     case network
     when :ether
+      turn_on_ether()
+    when :wifi
+      turn_on_wifi()
+    else
+      abort "ERROR: unrecognized network requested: '#{network}'"
+    end
+    puts network_violation_msg() if network_violation?
+  end
+
+  ################################################################################
+
+  private
+
+  def turn_on_ether()
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
+
       if ether[:enabled]
         print "#     "+"Ethernet is already on".GREEN
         if ether[:connected]
@@ -221,7 +216,7 @@ class Net
       #status = `#{cmd}`
       system "#{cmd}"
 
-      ether  = get_ether_info(refresh: true)
+      ether  = get_info(:ether, refresh: true)
       if ether[:enabled]
         seconds_to_wait=10
         begin
@@ -238,7 +233,7 @@ class Net
               print " #{wait_time}" if wait_time != seconds_to_wait
               wait_time -= 1
               sleep 1
-              ether  = get_ether_info(refresh: true)
+              ether  = get_info(:ether, refresh: true)
               if ether[:connected]
                 puts
                 puts "#       now connected (ip: #{ether[:ip].GREEN})"
@@ -250,11 +245,15 @@ class Net
           puts # to get on a new line
           puts "#     "+"WARNING: No connection!  Check the network cable. (or give it more time)".YELLOW
         end
-        puts network_violation_msg() if network_violation?
       else
         puts "ethernet is " + "disabled".RED
       end
-    when :wifi
+  end
+
+  def turn_on_wifi()
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
+
       if wifi[:enabled]
         print "#     "+"Wi-fi is already on".GREEN
         if wifi[:network]
@@ -268,7 +267,7 @@ class Net
       cmd="networksetup -setairportpower '#{wifi[:device]}' on"
       puts "# + #{cmd}" if verbose?
       status=`#{cmd}`
-      wifi  = get_wifi_info(refresh: true)
+      wifi  = get_info(:wifi, refresh: true)
       if wifi[:enabled]
         seconds_to_wait=5
         begin
@@ -285,7 +284,7 @@ class Net
               print " #{wait_time}" if wait_time != seconds_to_wait
               wait_time -= 1
               sleep 1
-              wifi  = get_wifi_info(refresh: true)
+              wifi  = get_info(:wifi, refresh: true)
               if wifi[:network]
                 puts
                 puts "#       now connected to '#{wifi[:network].GREEN}'"
@@ -298,74 +297,105 @@ class Net
           puts "#     "+"WARNING: No network has yet been joined!".YELLOW
           puts "#     "+"         You may need to manually select a wi-fi network. (or wait longer)"
         end
-        puts network_violation_msg() if network_violation?
       else
         puts "wi-fi is " + "disabled".RED
       end
-    else
-      abort "ERROR: unrecognized network requested: '#{network}'"
-    end
   end
 
-  def status(network = nil)
-    msg = []
-    if ! network
-      msg << "# Network status, in priority order:"
-      order[:order].each do |item|
-        msg << status(item)
-      end
-      msg << network_violation_msg() if network_violation?
-      return msg.join("\n") if msg
-    end
+  def refresh_network_info()
+    @wifi_info     = nil
+    @ether_info    = nil
+    @network_order = nil
+    @networks      = nil
+  end
 
-    status = ""
+  def verbose(flag)
+    @verbose = flag
+  end
+
+  def verbose?
+    @verbose
+  end
+
+  def ether_requires_proxy?()
+    ether = get_info(:ether)
+    ether[:ip] && ! ether[:ip].match(PROXY_RE).nil?
+  end
+  
+  def wifi_requires_proxy?()
+    wifi = get_info(:wifi)
+    wifi[:ip] && ! wifi[:ip].match(PROXY_RE).nil?
+  end
+  
+  def network_requires_proxy?()
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
+    return wifi_requires_proxy?()  if order[:first] == :wifi  &&   wifi[:enabled]
+    return ether_requires_proxy?() if order[:first] == :ether &&   ether[:enabled]
+    return ether_requires_proxy?() if order[:first] == :wifi  && ! wifi[:enabled]
+    return wifi_requires_proxy?()  if order[:first] == :ether && ! ether[:enabled]
+  end
+
+  def mixed_network?()
+    # true if both networks are enabled, but only one requires a proxy
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
+    return false unless wifi[:enabled] && ether[:enabled]
+    return ether_requires_proxy?() ^ wifi_requires_proxy?() # xor
+  end
+  
+  def switch_to(network)
+    joining_network = network
+    leaving_network = ( network == :ether ) ? :wifi : :ether
+    result = turn_off(leaving_network)
+    puts result
+    return if result =~ /error/i
+    turn_on(joining_network)
+  end
+
+  def network_name_human(network)
     case network
-    when :ether
-      info = get_ether_info()
-      status += "#   "
-      if info[:enabled] && info[:connected]
-        status += "#{info[:name]}".GREEN
-      else
-        status += "#{info[:name]}".RED
-      end
-      status += ": "
-      status += (info[:enabled]   ?   "enabled".GREEN   :   "disabled".RED)
-      status += (info[:connected] ? ", connected".GREEN : ", "+"disconnected".RED) if info[:enabled]
     when :wifi
-      info = get_wifi_info()
-      status += "#   "
-      if info[:enabled] && info[:network]
-        status += "#{info[:name]}".GREEN
-      else
-        status += "#{info[:name]}".RED
-      end
-      status += ": "
-      status += (info[:enabled] ?   "enabled".GREEN : "disabled".RED)
-      status += (info[:network] ? ", network: #{info[:network].GREEN}" : '')
+      "wi-fi"
+    when :ether
+      "ethernet"
     end
-    status
   end
 
-  def details(network)
+  def network_violation?()
+    network_violation_msg() != nil
+  end
+
+  def network_violation_msg()
+    ether = get_info(:ether)
+    wifi  = get_info(:wifi)
+
+    # check if we are on both a proxied network and a non-proxied network
     msg = []
-    info = get_wifi_info()  if network == :wifi
-    info = get_ether_info() if network == :ether
-    msg << "# "+"Current status of #{info[:name]} network:".YELLOW
-    info.keys.sort.each do |key|
-      the_key=key
-      if %w{enabled network connected}.include?(key.to_s)
-        if info[key]
-          the_key="#{key}".GREEN
-        else
-          the_key="#{key}".RED
-        end
-      end
-      msg << "#   #{the_key}: #{info[key]}"
+    if mixed_network?
+      proxy_network_in_use = ether_requires_proxy? ? 'ethernet' : 'wifi'
+      other_network_in_use = ether_requires_proxy? ? 'wifi'     : 'ethernet'
+      msg << "# "+"WARNING: Proxied network is enabled (#{proxy_network_in_use}), but so is a non-proxied network (#{other_network_in_use})!".YELLOW
+      msg << "# "+"         This can be a security risk.".YELLOW
+      msg << "# "+"         You should turn off one of the networks.".YELLOW
+      return msg.join("\n")
     end
-    msg.join("\n")
+    nil
   end
 
-  def get_wifi_info(options = {})
+  def get_info(network, options = {})
+    refresh_network_info() if options[:refresh]
+    case network
+    when :wifi
+      return @wifi_info if @wifi_info
+      XXget_wifi_info()
+    when :ether
+      return @ether_info if @ether_info
+      XXget_ether_info()
+    end
+  end
+
+  def XXget_wifi_info(options = {})
     refresh_network_info() if options[:refresh]
     return @wifi_info if @wifi_info
 
@@ -414,7 +444,7 @@ class Net
     @wifi_info
   end
 
-  def get_ether_info(options = {})
+  def XXget_ether_info(options = {})
     refresh_network_info() if options[:refresh]
     return @ether_info if @ether_info
 
