@@ -213,7 +213,6 @@ class Net
       end
       cmd="networksetup -setnetworkserviceenabled '#{ether[:name]}' on"
       puts "# + #{cmd}" if verbose?
-      #status = `#{cmd}`
       system "#{cmd}"
 
       ether  = get_info(:ether, refresh: true)
