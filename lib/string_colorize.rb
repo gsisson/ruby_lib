@@ -22,6 +22,7 @@ class String
   def magenta_bold;   "\033[1;35m#{self}\033[0m"; end
   def cyan;           "\033[0;36m#{self}\033[0m"; end
   def cyan_bold;      "\033[1;36m#{self}\033[0m"; end
+  def CYAN;           "\033[1;96m#{self}\033[0m"; end
   def gray;           "\033[0;37m#{self}\033[0m"; end
   def gray_bold;      "\033[1;37m#{self}\033[0m"; end
   def bg_black;       "\033[0;40m#{self}\033[0m"; end
@@ -63,6 +64,7 @@ class String
     puts 'magenta_bold'.magenta_bold
     puts 'cyan'.cyan
     puts 'cyan_bold'.cyan_bold
+    puts 'CYAN'.CYAN
     puts 'gray'.gray
     puts 'gray_bold'.gray_bold
     puts 'bg_black'.bg_black
