@@ -66,23 +66,23 @@ class Net
     ether = get_info(:ether)
     wifi  = get_info(:wifi)
     
-    preferred_network = :ether
+    preferred_network = :wifi
     preferred_network_name = network_name_human(preferred_network)
-    if    ether[:enabled] && ether[:connected] \
-      &&  wifi[:enabled] && wifi[:network]
-      puts indent "Both networks are enabled."
+
+    if network_accessible(:ether) && network_accessible(:wifi) 
+      puts indent "Both networks are available."
       puts indent "Switching to '#{preferred_network_name}'..."
       network_to_turn_off = preferred_network == :ether ? :wifi : :ether
       turn_off(network_to_turn_off)
       return
     end
-    if !ether[:enabled] && !wifi[:enabled]
-      puts indent "Neither network is enabled."
+    if !network_accessible(:ether) && !network_accessible(:wifi) 
+      puts indent "Neither network is available."
       puts indent "Switching to '#{preferred_network_name}'..."
       turn_on(preferred_network)
       return
     end
-    new_network = ether[:enabled] ? :wifi  : :ether
+    new_network = network_accessible(:ether) ? :wifi : :ether
     puts indent "Switching to #{new_network}"
     switch_to(new_network)
   end
