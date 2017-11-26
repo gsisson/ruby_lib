@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+#require 'fileutils'
+require_relative 'lib/dir2'
+
+def number_with_delimiter(number, delimiter)
+  parts = number.to_s.split('.')
+  parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+  parts.join(delimiter)
+end
+
+Dir2.glob_i('*.avi').each do |f|
+  if File.exist? "#{f}.mp4"
+    puts "already exists, so skipping:"
+    puts "  => \"#{f}.mp4\""
+    next
+  end
+  cmd="ffmpeg -i \"#{f}\" -deinterlace -acodec copy \"#{f}.mp4\""
+  puts   cmd
+  system cmd
+  puts "...done.  Created new file:"
+  puts "  file: \"#{f}.mp4\""
+  size = File.size("#{f}.mp4")
+  puts "  size: #{number_with_delimiter(size, ',')} bytes"
+end

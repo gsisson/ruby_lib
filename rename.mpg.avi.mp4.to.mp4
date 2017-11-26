@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require_relative 'lib/dir2'
+
+Dir2.glob_i('*.mpg.avi.mp4').each do |f|
+  t=f.sub(/\.mpg\.avi\.mp4$/i,'.mp4')
+  if File.exist? t
+    puts "target of rename already exists!:"
+    puts "  exists! => \"#{f}\""
+    next
+  end
+  puts "File.rename \"#{f}\", \"#{t}\""
+  File.rename "#{f}", "#{t}"
+end
