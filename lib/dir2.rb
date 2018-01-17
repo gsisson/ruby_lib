@@ -1,7 +1,29 @@
 require_relative 'date2'
+require_relative 'wait_spinner.rb'
 
 # Some useful methods on directories
 class Dir2
+  # fix Dir.pwd, which returns "/cygdrive/c/" instead of "c:/"
+  def self.pwd
+    # for RUBY_PLATFORM =~ /cygwin/
+    Dir.pwd.sub(/\/cygdrive\/([a-z])/,'\1:')
+  end
+  # glob case-insensitively with "_i" version (simpler to call)
+  def self.glob_i(pattern)
+    Dir.glob(pattern, File::FNM_CASEFOLD)    
+  end
+  # glob case-insensitively with []
+  def self.[](pattern)
+    glob_i(pattern)
+  end
+  # glob recursively for files
+  def self.all_files_recursively()
+    glob_i('**/*')
+  end
+  # glob recursively for dirs
+  def self.all_dirs_recursively()
+    glob_i('**/*/')
+  end
   # Useful to find just file types
   def self.symlink_or_directory?(f)
     # doesn't seem to work on Mac ???
@@ -9,10 +31,24 @@ class Dir2
     require_relative 'file_symlink'
     return File.symlink?(f) || File.directory?(f)
   end
-  # Simpler way to glob case-insensitively
-  def self.glob_i(pattern)
-    Dir.glob(pattern, File::FNM_CASEFOLD)    
+  ##########################################################################################
+  # find by TYPE
+  ##########################################################################################
+  # return all that are files
+  def self.files(glob_arg)
+    Dir2.glob_i(glob_arg).select do |f|
+      File.exist?(f) && !File.symlink?(f)
+    end
   end
+  # return all that are directories or symbolic links
+  def self.dir_or_symlink(glob_arg)
+    Dir2.glob_i(glob_arg).select do |f|
+      File.symlink?(f) || Dir.exist?(f)
+    end
+  end
+  ##########################################################################################
+  # find files by EXTENSION
+  ##########################################################################################
   # return all jpgs, case insensitive
   def self.glob_i_jpgs
     glob_i("*.{jpg,jpeg}")
@@ -28,56 +64,14 @@ class Dir2
   def self.glob_i_images_movies_and_text
     glob_i("*.{bmp,jpg,jpeg,png,gif,avi,wmv,mov,mpg,mpeg,mpe,txt}")
   end
-  # return all that are files
-  def self.files(glob_arg)
-    Dir2.glob_i(glob_arg).select do |f|
-      File.exist?(f) && !File.symlink?(f)
-    end
-  end
-  # return all that are directories or symbolic links
-  def self.dir_or_symlink(glob_arg)
-    Dir2.glob_i(glob_arg).select do |f|
-      File.symlink?(f) || Dir.exist?(f)
-    end
-  end
-  # fix Dir.pwd, which returns "/cygdrive/c/" instead of "c:/"
-  def self.pwd
-    # for RUBY_PLATFORM =~ /cygwin/
-    Dir.pwd.sub(/\/cygdrive\/([a-z])/,'\1:')
-  end
-  # does the passed string contain a date-time prefix?
-  #  "2005-23-10_23.23.23_DEF" => true
-  #  "2005-23-10"              => false
-  def self.date_time_prefix?(directory)
-    date_time_prefix(directory) ? true : false
-  end
-  # return the date-time prefix of the passed string
-  #  "2005-23-10_23.23.23_DEF" => "2005-23-10_23.23.23"
-  #  "2005-23-10"              => nil
-  def self.date_time_prefix(directory)
-    dtp=File.basename(directory)[0..18]
-    return nil if ! Date2.valid_date_time?(dtp)
-    Date2.prefix_for_file(dtp)
-  end
-  # does the passed string contain a date-time prefix?
-  #  "2005-23-10_DEF" => true
-  #  "2005-23-XX"     => false
-  def self.date_prefix?(directory)
-    date_prefix(directory) ? true : false
-  end
-  # return the date prefix of the passed string
-  #  "2005-23-10_DEF" => "2005-23-10"
-  #  "2005-23-XX"     => nil
-  def self.date_prefix(directory)
-    dtp=File.basename(directory)[0..9]
-    return nil if ! Date2.valid_date?(dtp)
-    Date2.prefix_for_file(dtp)
-  end
+  ##########################################################################################
+  # find files and flatten
+  ##########################################################################################
   # return the union of all the non-directory files found in all the directories passed
   # ex: Dir2.files_in_dirs( [ '.', '.ssh' ] )
   @entries = {}
   def self.files_in_dirs(dir_array, options = {})
-    prob_dirs = validate_dirs_or_symbols_PRIVATE(dir_array)
+    prob_dirs = find_non_dirs_and_non_symbols_PRIVATE(dir_array)
     if prob_dirs.size > 0
       if options[:verbose]
         puts "ERROR: directories do not exist:"
@@ -118,8 +112,43 @@ class Dir2
     end
     all_files.sort!
   end
-  # private private private private private private private private private
-  def self.validate_dirs_or_symbols_PRIVATE(dir_array)
+  ##########################################################################################
+  # DATE TIME format related methods for file/dir names
+  ##########################################################################################
+  # does the passed string contain a date-time prefix?
+  #  "2005-23-10_23.23.23_DEF" => true
+  #  "2005-23-10"              => false
+  def self.date_time_prefix?(directory)
+    date_time_prefix(directory) ? true : false
+  end
+  # return the date-time prefix of the passed string
+  #  "2005-23-10_23.23.23_DEF" => "2005-23-10_23.23.23"
+  #  "2005-23-10"              => nil
+  def self.date_time_prefix(directory)
+    dtp=File.basename(directory)[0..18]
+    return nil if ! Date2.valid_date_time?(dtp)
+    Date2.prefix_for_file(dtp)
+  end
+  # does the passed string contain a date-time prefix?
+  #  "2005-23-10_DEF" => true
+  #  "2005-23-XX"     => false
+  def self.date_prefix?(directory)
+    date_prefix(directory) ? true : false
+  end
+  # return the date prefix of the passed string
+  #  "2005-23-10_DEF" => "2005-23-10"
+  #  "2005-23-XX"     => nil
+  def self.date_prefix(directory)
+    dtp=File.basename(directory)[0..9]
+    return nil if ! Date2.valid_date?(dtp)
+    Date2.prefix_for_file(dtp)
+  end
+  # PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE
+  # PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE
+  # PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE PRIVATE
+  private
+  # given an array, return an array of all then non-symbol/non-directory items in the array
+  def self.find_non_dirs_and_non_symbols_PRIVATE(dir_array)
     prob_dirs = []
     dir_array.each do |d|
       if ! d.instance_of? Symbol

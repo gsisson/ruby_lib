@@ -25,14 +25,21 @@ class WaitSpinner
   def stop
     print "\b"
   end
-  # call this with a block, and the spinner will run continuously
-  # until the block finishes
+  # call this with a block THAT SLEEPS, and the spinner will run continuously
+  # until the block finishes SLEEPING
   # example:
+  #
   #   print "Doing something tricky..."
   #   WaitSpinner.show_wait_spinner {
   #     sleep rand(4)+2 # Simulate a task taking an unknown amount of time
   #   }
   #   puts "Done!"
+  #
+  # Note that it does NOT WORK with long-running NON-SLEEP commands on MRI ruby
+  # because MRI ruby has the GIL which means only the 'spinner' code will run or
+  # the code in the passed block will run.  In fact, it appears on-sleep code will
+  # always run, and the spinner code never gets to run.  For example, change "sleep"
+  # above to Dir.glob('/*/**') to find all files and you'll never see the wait spinner.
   def self.show_wait_spinner(fps=10)
     delay = 1.0/fps
     iter = 0
