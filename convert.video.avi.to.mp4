@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+#require 'fileutils'
+require_relative 'lib/dir2'
+
+def number_with_delimiter(number, delimiter)
+  parts = number.to_s.split('.')
+  parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+  parts.join(delimiter)
+end
+
+ext=__FILE__.split('/')[-1].split('.')[2]
+#if ARGV.length == 0
+#  STDERR.puts "usage: #{__FILE__.split('/')[-1]} <#{ext.upcase} FILES>"
+#  exit 1
+#end
+
+files=Dir2.glob_i("*.#{ext}")
+
+if files.length == 0
+  puts "no .#{ext} files found"
+  exit
+end
+
+Dir2.glob_i("*.#{ext}").each do |f|
+  if File.exist? "#{f}.mp4"
+    puts "already exists, so skipping:"
+    puts "  => skipping \"#{f}.mp4\""
+    next
+  end
+# cmd="ffmpeg -hide_banner -i \"#{f}\" -deinterlace -acodec copy \"#{f}.mp4\""
+  cmd="ffmpeg -hide_banner -i \"#{f}\" -deinterlace              \"#{f}.mp4\""
+  puts   cmd
+  system cmd
+  puts "...done.  Created new file:"
+  puts "  file: \"#{f}.mp4\""
+  size = File.size("#{f}.mp4")
+  puts "  size: #{number_with_delimiter(size, ',')} bytes"
+end

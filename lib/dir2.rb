@@ -37,7 +37,7 @@ class Dir2
   # return all that are files
   def self.files(glob_arg)
     Dir2.glob_i(glob_arg).select do |f|
-      File.exist?(f) && !File.symlink?(f)
+      File.exist?(f) && !File.directory?(f) && !File.symlink?(f)
     end
   end
   # return all that are directories or symbolic links
@@ -88,7 +88,10 @@ class Dir2
       files = @entries[d]
       if ! files
         print "loading '#{File.basename(d)}'..." if options[:verbose]
-        files = @entries[d] = Dir.entries(d)
+        files = Dir.entries(d)
+        files = files[1..-1] if files.size >= 1 && files[0] == '.'
+        files = files[1..-1] if files.size >= 1 && files[0] == '..'
+        @entries[d] = files
         puts files.size if options[:verbose]
       end
       fast = true
