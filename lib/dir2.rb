@@ -10,7 +10,7 @@ class Dir2
   end
   # glob case-insensitively with "_i" version (simpler to call)
   def self.glob_i(pattern)
-    Dir.glob(pattern, File::FNM_CASEFOLD)    
+    Dir.glob(pattern, File::FNM_CASEFOLD)
   end
   # glob case-insensitively with []
   def self.[](pattern)
@@ -159,6 +159,10 @@ class Dir2
       end
     end
     prob_dirs
+  end
+  # are the files hard linked?
+  def self.ino_eq(f1,f2)
+    File.stat(f1).ino == File.stat(f2).ino
   end
 end
 
