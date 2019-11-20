@@ -104,7 +104,7 @@ class Dir2
       end
       if all_files.size == 0
         #puts "avoiding .push()..."
-        all_files = files
+        all_files = files.clone
       else
         #puts all_files.size
         #puts files.size
@@ -165,4 +165,3 @@ class Dir2
     File.stat(f1).ino == File.stat(f2).ino
   end
 end
-
