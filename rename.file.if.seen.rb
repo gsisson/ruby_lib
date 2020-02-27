@@ -23,4 +23,5 @@ loop do
     puts "resuming watch for file (#{file_source})..."
   end
   sleep 1 # second
+  puts "watching for file (#{file_source})..."
 end

@@ -1,5 +1,1 @@
-coverage/
-c:/
-/.idea/
-/**/*_diff
-lib/.vscode/
+.vscode
