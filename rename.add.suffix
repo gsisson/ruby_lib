@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 # require_relative 'lib/dir2'
+require_relative 'lib/string_colorize'
 
 def usage()
   STDERR.puts "usage: #{File.basename(__FILE__)} SUFFIX <files>"
@@ -8,15 +9,29 @@ def usage()
   abort
 end
 
-usage if ARGV.count < 2
-suffix = ARGV[0]
-ARGV.shift
-
-ARGV.each do |f|
-  abort "\nERROR: Cannot file file: \"#{f}\"\n\n" if ! File.exist? f
+def main
+  usage if ARGV.count < 2
+  suffix = ARGV[0]
+  ARGV.shift
+  
+  ARGV.each do |f|
+    abort "\nERROR: Cannot file file: \"#{f}\"\n\n" if ! File.exist? f
+  end
+  
+  ARGV.each do |f|
+    puts "File.rename \"#{f}\", \"#{f}#{suffix}\""
+    File.rename "#{f}", "#{f}#{suffix}"
+  end
 end
 
-ARGV.each do |f|
-  puts "File.rename \"#{f}\", \"#{f}#{suffix}\""
-  File.rename "#{f}", "#{f}#{suffix}"
+begin
+  main
+rescue SystemExit => e
+  raise # handle 'exit/abort' w/o stack trace; re-raise to pass return code to shell
+rescue Interrupt => e
+  puts "\nCancelled by user."
+rescue Exception => e # shouldn't handle this, Kevin Skoglund says!
+  puts "ERROR: #{e.message}".red_bold
+  puts e.backtrace
+  abort
 end
