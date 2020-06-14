@@ -3,7 +3,6 @@ source 'https://rubygems.org'
 group :test, :development do
   gem 'fakefs',   require: "fakefs/safe"
   gem 'rspec',    require: false
-  gem 'rubocop',  require: false
 end
 
 group :test do

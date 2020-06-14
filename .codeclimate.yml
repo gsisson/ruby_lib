@@ -12,11 +12,6 @@ engines:
       - php
   fixme:
     enabled: true
-  rubocop:
-    enabled: true
-    checks:
-      Rubocop/Metrics/ParameterLists:
-        enabled: false
   shellcheck:
     enabled: true
 ratings:

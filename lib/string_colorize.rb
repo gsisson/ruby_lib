@@ -44,7 +44,6 @@ class String
   def bold;           "\033[0;1m#{self}\033[22m"; end
   def reverse_color;  "\033[0;7m#{self}\033[27m"; end
 
-  # rubocop:disable Metrics/MethodLength
   def self.showcolors
     puts 'black'.black
     puts 'black_bold'.black_bold
