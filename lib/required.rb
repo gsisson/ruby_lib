@@ -22,7 +22,7 @@ module Required
     rescue LoadError => e
       # caller[2] should be something like: "./some_file.rb:80:in '<main>'"
       # we just need to extract the file name and line number
-      match = /(.*):(\d):/.match(caller[2])
+      match = /(.*):(\d+):/.match(caller[2])
       if match && match[1] && match[2]
         script_name, line_no = match[1..2]
         caller="#{script_name}, line #{line_no}"
