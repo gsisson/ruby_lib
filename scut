@@ -1,0 +1,127 @@
+#!/usr/bin/env ruby
+
+require '~/usr/ruby/lib/dir2'
+require 'fileutils'
+#require 'win32/shortcut'
+#include Win32
+
+ALL_FILES_FILE="t:/recyclable/v/find.txt"
+
+def local_files_cnt()
+  Dir2.glob_i('*').size
+end
+
+def local_lnk_files()
+  files = Dir2.glob_i('*lnk')
+  files.select {|f| ! f.end_with?('.DIR.lnk') }
+end
+
+def fix_shortcuts()
+  files = local_lnk_files()
+  files.each do |f|
+    ending=' - Shortcut'
+    endings = [ending]
+    while ending.length > 1 do
+      ending = ending[0..-2]
+      endings << ending
+    end
+    endings.each do |ending|
+      ending="#{ending}.lnk"
+      if f.end_with?(ending)
+        #puts "FileUtils.mv( '#{f}',"
+        #puts "              '#{f.sub(ending,'.lnk')}'"
+        FileUtils.mv(f, f.sub(ending,'.lnk'))
+      end
+    end
+  end
+end
+
+def restore_shortcuts(dict)
+  files = local_lnk_files()
+  file_cnt_in = local_files_cnt()
+  files.map! { |f| f[0..-5] } # drop last 4 chars (the '.lnk')
+  errs=[]
+  files.each do |f|
+    errs << f if !dict[f]
+  end
+  if errs.size > 0
+    puts "ERROR: target file not found (in #{ALL_FILES_FILE})!"
+    errs.each do |e|
+      puts "       file:#{e}:"
+    end
+    puts "       (maybe run findvid script to regen the file...)"
+    puts "       exiting..."
+    exit 1
+  end
+  errs=[]
+  files.each do |f|
+    #num=f[/^#[0-9][0-9][0-9][0-9][0-9][0-9]#/]
+    #opt=f.sub(num,'')[/[a-z]#/]
+    #base=f.sub("#{num}#{opt}",'')
+    tgt="#{dict[f]}/#{f}"
+    errs << f if !File.exist?(tgt)
+  end
+  if errs.size > 0
+    puts "ERROR: target file not found on disk!"
+    errs.each do |e|
+      puts "       file:#{e}:"
+    end
+    puts "       exiting..."
+    exit 1
+  end
+  files.each do |f|
+    puts "====================================="
+    puts "restoring shortcut..."
+    puts "   #{f}"
+    puts "=> #{dict[f]}"
+    tgt="#{dict[f]}/#{f}"
+    if !File.exist?(tgt)
+      puts "ERROR: not found:"
+      puts "       #{tgt}"
+      exit 1
+    end
+    puts "system \"/usr/bin/mkshortcut.exe #{tgt}\""
+    system "/usr/bin/mkshortcut.exe #{tgt}"
+    file_cnt_now = local_files_cnt()
+    if file_cnt_now != file_cnt_in
+      puts "ERROR: shortcut not created as expected!"
+      puts "       started with '#{file_cnt_in}' files in this dir"
+      puts "       but now have '#{file_cnt_now}' files in this dir"
+      exit 1
+    end
+  end
+end
+
+def read_all_non_shortcuts()
+  all_files = IO.readlines(ALL_FILES_FILE)
+  dict={}
+  errs=[]
+  all_files.each do |f|
+    f.chomp!
+    next if /.lnk$|.jpg$|.prproj/.match?(f)
+    tgt="/cygdrive/t/RECYCLABLE/v/#{File.dirname(f)[2..-1]}"
+    if dict[File.basename(f)]
+      msg = "#{File.basename(f)} found in two locations:\n" +
+            " => #{dict[File.basename(f)]}\n" +
+            " => #{tgt}"
+      errs << msg
+    end
+    dict[File.basename(f)] = tgt # remove leading "./"
+  end
+  if errs.size > 0
+    puts "ERROR: Some shortcuts are found multiple times on filesystem:"
+    errs.each do |e|
+      puts e
+    end
+    puts "       exiting..."
+    exit 1
+  end
+  dict
+end
+
+fix_shortcuts()
+dict=read_all_non_shortcuts()
+restore_shortcuts(dict)
+
+__END__
+

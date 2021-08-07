@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+#find . -type d | tail +2 | while read d
+find . -type d | while read d
+do
+  cd "$d"
+  echo "======================================================"
+  echo " DIR: $d"
+  echo "======================================================"
+  if ! scut
+  then
+    echo "ERROR while in $PWD"
+    break
+  fi
+  cd - >/dev/null
+done
