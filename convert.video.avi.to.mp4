@@ -22,7 +22,9 @@ if ARGV.size > 0
       abort "ERROR: file DNE: #{f}"
     end
     if f !~ /#{ext}$/
-      abort "ERROR: file does not end with '.#{ext}': #{f}"
+      puts "WARNING: file does not end with '.#{ext}': #{f}"
+      puts "(sleep 2)"
+      sleep 2
     end
   end
 else
