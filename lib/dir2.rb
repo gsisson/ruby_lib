@@ -53,6 +53,10 @@ class Dir2
   def self.glob_i_jpgs
     glob_i("*.{jpg,jpeg}")
   end
+  # return all lnks, case insensitive
+  def self.glob_i_lnks
+    glob_i("*.lnk")
+  end
   # return all jpgs+cr2 files, case insensitive
   def self.glob_i_jpgs_cr2s
     glob_i("*.{jpg,jpeg,cr2}")
