@@ -106,11 +106,14 @@ class FindVid
     STDERR.puts "=========================="
     curdir=Dir2.pwd
     
-    Dir.chdir DIR
-    files = Dir2.all_files_recursively()
-    files.map! {|i|"#{DIR}#{i}"}
-    Dir.chdir DIR2
+    files = files2 = nil
+    Dir.chdir(DIR) do
+      files = Dir2.all_files_recursively()
+      files.map! {|i|"#{DIR}#{i}"}
+    end
+    Dir.chdir(DIR2) # can't use Dir.chdir block here, as Dir2.files() also uses a block :-(
     files2 = Dir2.files("*") # Dir2.files('#*')
+    Dir.chdir(curdir)
     files2.map! {|i|"#{DIR2}#{i}"}
     files += files2
     
