@@ -30,7 +30,7 @@ class FindVid
     end
     value
   end
-  def cleann(n)
+  def self.cleann(n)
     # examples that return '665572'
     # examples that return '665572'
     # puts cleann('_5_#048585#abcd.txt')
@@ -69,36 +69,34 @@ class FindVid
     if arguments.size == 0
       usage
     end
-    if arguments[0] == '-n' || arguments[0] == '-'
-      if arguments[0] == '-n'
-        number_only='true'
+    no_lnks = false
+    arguments.each_with_index do |arg, i|
+      if arg == '-v'
+        no_lnks = true
+        arguments.delete_at(i)
+        break
       end
-      arguments.shift
-      if arguments.size != 0
-        usage "ERROR: '-' or '-n' take no additional arguments"
+    end
+    arguments.each_with_index do |arg, i|
+      if arg == '-'
+        n=Clipboard.paste.split
+        usage "ERROR: clipboard contains more than one line!" if n.size != 1
+        arguments[i]=n[0]
+        break
       end
-      n=Clipboard.paste.split
-      if n.size != 1
-        usage "ERROR: clipboard contains more than one line!"
-      end
-      n=n[0]
-      STDERR.puts n
-      if n !~ /^#?[0-9][0-9][0-9][0-9][0-9][0-9]#?$/
-        if number_only == 'true'
-          usage "ERROR: string does not start with a number!"
-        end
-      end
-      if number_only == 'true'
-        clean_n = cleann(n)
-        if clean_n.size == 0
+    end
+    arguments.each_with_index do |arg, i|
+      if arg =~ /^#?[0-9][0-9][0-9][0-9][0-9][0-9]#?$/
+        STDERR.puts arg
+        n = cleann(arg)
+        if n.size == 0
+          STDERR.puts "INTERNAL ERROR: cleaned up a number and got an empty string??"
           exit 1
         end
+        arguments[i] = n
       end
-      items = [n]
-    else
-      items = arguments
     end
-    
+    items = arguments
     STDERR.puts "=========================="
     STDERR.print "searching for: "
     items.each { |i| STDERR.print "#{i} " }
@@ -128,7 +126,12 @@ class FindVid
     
     #STDERR.puts "#{files.length}"
     # reject files of types not interested in
-    files.select! {|i| i !~ /jpg$|jpeg$|txt$|xmp$|png$|sh$|prproj$/i }
+    if no_lnks
+      re=/jpg$|jpeg$|txt$|xmp$|png$|sh$|prproj$|lnk$/i
+    else
+      re=/jpg$|jpeg$|txt$|xmp$|png$|sh$|prproj$/i
+    end
+    files.select! {|i| i !~ re }
     #STDERR.puts "#{files.length}"
     
     items.each do |arg|
