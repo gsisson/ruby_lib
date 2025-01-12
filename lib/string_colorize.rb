@@ -6,20 +6,28 @@ class String
   end
   def black;          "\033[0;30m#{self}\033[0m"; end
   def black_bold;     "\033[1;30m#{self}\033[0m"; end
+  def black_on_yellow; "\033[7;49;93m#{self}\033[0m"; end
+  def black_on_gold;   "\033[7;49;33m#{self}\033[0m"; end
   def red;            "\033[0;31m#{self}\033[0m"; end
   def red_bold;       "\033[1;91m#{self}\033[0m"; end
+  def red_on_grey;    "\033[1;100;91m#{self}\033[0m"; end
   def RED;            red_bold; end
+  def orange;         "\033[38;05;214m#{self}\033[0m"; end
   def green;          "\033[0;32m#{self}\033[0m"; end
   def green_bold;     "\033[1;32m#{self}\033[0m"; end
+  def green_on_grey;  "\033[1;100;32m#{self}\033[0m"; end
   def GREEN;          "\033[1;92m#{self}\033[0m"; end
   def brown;          "\033[0;33m#{self}\033[0m"; end # yellow
   def brown_bold;     "\033[1;33m#{self}\033[0m"; end # yellow
   def yellow;         "\033[1;49;93m#{self}\033[0m"; end
+  def yellow_on_grey; "\033[7;103;90m#{self}\033[0m"; end
   def YELLOW;         yellow; end
   def blue;           "\033[0;34m#{self}\033[0m"; end
   def blue_bold;      "\033[1;34m#{self}\033[0m"; end
   def magenta;        "\033[0;35m#{self}\033[0m"; end
   def magenta_bold;   "\033[1;35m#{self}\033[0m"; end
+  def purple;         "\033[0;49;95m#{self}\033[0m"; end
+  def purple_bold;    "\033[1;49;95m#{self}\033[0m"; end
   def cyan;           "\033[0;36m#{self}\033[0m"; end
   def cyan_bold;      "\033[1;36m#{self}\033[0m"; end
   def CYAN;           "\033[1;96m#{self}\033[0m"; end
@@ -42,7 +50,11 @@ class String
   def bg_gray;        "\033[0;47m#{self}\033[0m"; end
   def bg_gray_bold;  "\033[1;47m#{self}\033[0m"; end
   def bold;           "\033[0;1m#{self}\033[22m"; end
-  def reverse_color;  "\033[0;7m#{self}\033[27m"; end
+  def inverse;        "\033[0;7m#{self}\033[27m"; end
+  def reverse;        inverse; end
+  def reverse_color;  inverse; end
+  def RED;            red_bold; end
+  def flash;          "\033[5;40;96m#{self}\033[0m"; end
 
   def self.showcolors
     puts 'black'.black

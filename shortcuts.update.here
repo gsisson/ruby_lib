@@ -12,6 +12,7 @@ def usage(args = nil)
   name = File.basename(__FILE__)
   STDERR.puts("\n#{args}\n\n") if args != nil
   STDERR.puts "usage: #{name} [-r]"
+  STDERR.puts "       #{name} [files...]"
   exit 1
 end
 
@@ -21,23 +22,55 @@ if ! Dir.exist?(DIR)
 end
 
 recursive=false
-usage if ARGV.count > 1
-if ARGV.count > 0
-  usage if ARGV[0] != '-r'
+if ARGV.count > 0 && ARGV[0] == '-r'
   recursive=true
+  ARGV.shift
+  usage if ARGV.count > 0
 end
 
-dirs = [Dir2.pwd]
-dirs = ["./"]
+err=false
+dirs=[]
+files=[]
+usage if ARGV.count == 0
+
+if ARGV.count > 0
+  files=ARGV
+  files.each do |f|
+    if ! File.exist?(f)
+      STDERR.puts "File DNE: `#{f}`"
+      err=true
+    end
+  end
+else
+  dirs = ["./"]
+end
+exit 1 if err
+
 if recursive
   dirs += Dir2.all_dirs_recursively()
 end
+
+puts "dirs:#{dirs}:"
+puts "files:#{files}:"
 
 vids=FS.all_vids_recursively(DIR)
 
 # ensure all lnk files are valid
 links={}
 errs=[]
+for lnk in files
+  dir="./"
+  lnk_f="/#{File.basename(lnk).sub(/.lnk$/,'')}"
+  next if lnk_f !~ FS::VIDEO_EXTENSIONS
+  vids_match = vids.select { |vid| vid[lnk_f] }
+  if vids_match.size != 1
+    msg = "  #{dir}#{lnk}: (vids_match.size:#{vids_match.size})\n"
+    vids_match.each {|vid| msg += "    #{vid}\n" }
+    errs << msg
+  else
+    links["#{dir}#{lnk}"] = vids_match[0]
+  end
+end
 for dir in dirs
   Dir.chdir dir do  
     local_lnks = Dir2.glob_i('*.lnk') # ('**/*.lnk')
@@ -55,12 +88,31 @@ for dir in dirs
     end
   end
 end
+
+#puts "dirs:#{dirs}:"
+#puts "files:#{files}:"
 if errs.size > 0
   STDERR.puts "found invalid lnk files:"
   errs.each { |err| STDERR.puts err }
   STDERR.puts "exiting..."
   exit 1
 end
+
+    dir="./"
+    puts "==========================================================="
+   #local_lnks = Dir2.glob_i('*.lnk') # ('**/*.lnk')
+    local_lnks = files
+    local_lnks.each do |lnk|
+      lnk_f=File.basename(lnk).sub(/.lnk$/,'')
+      next if lnk_f !~ FS::VIDEO_EXTENSIONS
+      tgt=links["#{dir}#{lnk}"]
+      puts "  relink #{lnk}"
+      puts "      to #{tgt}"
+      puts "  + mkshortcut_in_cwd(#{tgt})"
+      FS.mkshortcut_in_cwd(tgt)
+      puts "    (done)"
+    end
+    puts
 
 for dir in dirs
   Dir.chdir dir do
@@ -74,19 +126,8 @@ for dir in dirs
       puts "  relink #{lnk}"
       puts "      to #{tgt}"
       puts "  + mkshortcut_in_cwd(#{tgt})"
-      if tgt == 't:/RECYCLABLE/v/blah/blah'
-        STDERR.puts "    ===========> skipping blah blah <============"
-        STDERR.puts "    ===========> skipping blah blah <============"
-        STDERR.puts "    ===========> skipping blah blah <============"
-        STDERR.puts "    ===========> skipping blah blah <============"
-        STDERR.puts "    ===========> skipping blah blah <============"
-        STDERR.puts "    ===========> skipping blah blah <============"
-        STDERR.puts "    ===========> skipping blah blah <============"
-        return
-      else
-        FS.mkshortcut_in_cwd(tgt)
-        puts "    (done)"
-      end
+      FS.mkshortcut_in_cwd(tgt)
+      puts "    (done)"
     end
     puts
   end

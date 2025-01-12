@@ -2,6 +2,7 @@
 
 require '~/usr/ruby/lib/dir2.rb'
 require '~/usr/ruby/lib/file_symlink'
+require '~/usr/ruby/lib/string_colorize.rb'
 require 'clipboard' #gem install clipboard
 
 class FindVid
@@ -12,6 +13,8 @@ class FindVid
     STDERR.puts("\n#{args}\n\n") if args != nil
     STDERR.puts "usage: #{name} -"
     STDERR.puts "   or: #{name} -n"
+    STDERR.puts "   or: #{name} -v # vid"
+    STDERR.puts "   or: #{name} -l # lnk"
     STDERR.puts "   or: #{name} UID"
     STDERR.puts "   or: #{name} <SEARCH_STRING>..."
     STDERR.puts "       -   clipboard will hold a string to look for"
@@ -19,16 +22,15 @@ class FindVid
     exit 1
   end
   def self.matchit(i,arg)
-    #            %r{[^a-zA-Z]#{arg}[^a-zA-Z/]*}i # wrong!
-    #            %r{[^a-zA-Z]#{arg}[^a-zA-Z/]+}i # unnecessary?
-    value = i =~ %r{[^a-zA-Z]#{arg}[^a-zA-Z/]}i || i =~ %r{[^a-zA-Z]#{arg}$}i
-    if ( i =~ /0000.dress/ )
-      ['.00','.30','.50','.60','.72','.75'].each do |j|
-        i_test = i.sub("0000.dress#{j}",'')
-        value = value && i_test =~ %r{[^a-zA-Z]#{arg}[^a-zA-Z/]}i
-      end
-    end
-    value
+    i = File.basename(i) # get rid of path, as we don't want to be matching in the path!
+    value = i =~ %r{[^a-zA-Z]#{arg}[^a-zA-Z/]}i || i =~ %r{[^a-zA-Z]#{arg}$}i || i =~ %r{^#{arg}[^a-zA-Z/]}i || i =~ %r{^#{arg}$}i
+    #if ( i =~ /0000.dress/ )
+    #  ['.00','.30','.50','.60','.72','.75'].each do |j|
+    #    i_test = i.sub("0000.dress#{j}",'')
+    #    value = value && i_test =~ %r{[^a-zA-Z]#{arg}[^a-zA-Z/]}i
+    #  end
+    #end
+    value != nil
   end
   def self.cleann(n)
     # examples that return '665572'
@@ -70,12 +72,21 @@ class FindVid
       usage
     end
     no_lnks = false
+    only_lnks = false
     arguments.each_with_index do |arg, i|
       if arg == '-v'
         no_lnks = true
         arguments.delete_at(i)
         break
       end
+      if arg == '-l'
+        only_lnks = true
+        arguments.delete_at(i)
+        break
+      end
+    end
+    if no_lnks && only_lnks
+      usage "ERROR: cannot use -v and +v together"
     end
     arguments.each_with_index do |arg, i|
       if arg == '-'
@@ -97,12 +108,14 @@ class FindVid
       end
     end
     items = arguments
-    STDERR.puts "=========================="
-    STDERR.print "searching for: "
-    items.each { |i| STDERR.print "#{i} " }
+   #STDERR.puts "===================================================="
+   #STDERR.puts "searching:"
+    STDERR.print "searching: "
+    items.each { |i| STDERR.print "#{i} ".cyan_bold }
     STDERR.puts
-    STDERR.puts "=========================="
+   #STDERR.puts "=========================="
     curdir=Dir2.pwd
+    curdir="#{curdir}/" if curdir =~ /^[a-z]:$/
     
     files = files2 = nil
     Dir.chdir(DIR) do
@@ -121,17 +134,21 @@ class FindVid
     if test_special_case
       items = []
       files = []
-      items[0]=''
     end
     
     #STDERR.puts "#{files.length}"
     # reject files of types not interested in
-    if no_lnks
-      re=/jpg$|jpeg$|txt$|xmp$|png$|sh$|prproj$|lnk$/i
+    if only_lnks
+      re=/lnk$/i
+      files.select! {|i| i =~ re }
     else
-      re=/jpg$|jpeg$|txt$|xmp$|png$|sh$|prproj$/i
+      if no_lnks
+        re=/aae$|jpeg$|txt$|xmp$|png$|sh$|prproj$|lnk$/i
+      else
+        re=  /aae$|jpg$|jpeg$|txt$|xmp$|png$|sh$|prproj$/i
+      end
+      files.select! {|i| i !~ re }
     end
-    files.select! {|i| i !~ re }
     #STDERR.puts "#{files.length}"
     
     items.each do |arg|
@@ -139,7 +156,8 @@ class FindVid
       #STDERR.puts "-> #{files.length}"
       #STDERR.puts "--> #{files[0]}"
       files.select! do |i|
-        matchit(i,arg)
+        #puts "matchit(#{i},#{arg})"
+        matchit(i,arg.sub('(','\(').sub(')','\)').sub('^','\^').sub('+','\+'))
       end
       #STDERR.puts "-> #{files.length}"
       #STDERR.puts "--> #{files[0]}"

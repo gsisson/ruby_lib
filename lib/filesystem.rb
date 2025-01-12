@@ -6,9 +6,11 @@
 require 'open3'
 require 'fileutils'
 require '~/usr/ruby/lib/dir2.rb'
+require '~/usr/ruby/lib/string_colorize.rb'
 
 class FS
   VIDEO_EXTENSIONS = /f4v$|webm$|m2v$|m2t$|flv$|mts$|m4v$|avi$|3gp$|wmv$|mov$|mp4$|mpg$|mpeg$|mkv$/i
+  AUDIO_EXTENSIONS = /mp3$/i
   def self.mkshortcut_in_cwd(tgt)
     tgt = tgt.sub("t:/","/cygdrive/t/")
     # puts "in dir: #{Dir.pwd}"
@@ -55,14 +57,18 @@ class FS
       end
     end
     if probs.size > 0
-      STDERR.puts("ERROR (in filesystem.rb):")
-      STDERR.puts("  found dup-named vids:")
+      STDERR.puts("ERROR (in filesystem.rb):".red_bold)
+      STDERR.puts("  found dup-named vids:".red_bold)
       probs.each do |prob|
         puts "       #{prob}"
-        puts "       #{hash[File.basename(prob)]}"
+        puts "         #{hash[File.basename(prob)]}"
       end
+      STDERR.puts("^^^^^^^^^^^^^^^^^^^^^".red_bold)
+      STDERR.puts("ERROR (in filesystem.rb)!".red_bold)
+      STDERR.puts("  found dup-named vids!".red_bold)
       exit 1
     end
+    hash
   end
   def self.shortcuts_remove_if_exist_in_subdir
     sub_lnks = Dir2.glob_i('**/*.lnk').select { |item| item =~ /\//}
